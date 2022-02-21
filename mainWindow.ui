@@ -1,0 +1,2303 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1620</width>
+    <height>1080</height>
+   </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="windowTitle">
+   <string>核脉冲数据生成分析</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="resources.qrc">
+    <normaloff>:/图标/assets/generate_probGraph_640.svg</normaloff>:/图标/assets/generate_probGraph_640.svg</iconset>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <layout class="QGridLayout" name="gridLayout_2">
+    <item row="0" column="1">
+     <layout class="QGridLayout" name="gridLayout">
+      <property name="sizeConstraint">
+       <enum>QLayout::SetDefaultConstraint</enum>
+      </property>
+      <item row="3" column="0" colspan="3">
+       <layout class="QGridLayout" name="gridLayout_4">
+        <item row="0" column="3">
+         <widget class="QLabel" name="label_4">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Minimum" vsizetype="Maximum">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="text">
+           <string>能量：</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="2">
+         <widget class="QLabel" name="label_13">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>ch    </string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="8">
+         <spacer name="horizontalSpacer_4">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="0" column="0">
+         <widget class="QLabel" name="label">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Minimum" vsizetype="Maximum">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="tabletTracking">
+           <bool>false</bool>
+          </property>
+          <property name="text">
+           <string>道址：</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QLCDNumber" name="lcdNumber_currentPathValue">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>125</width>
+            <height>32</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>200</height>
+           </size>
+          </property>
+          <property name="font">
+           <font>
+            <pointsize>9</pointsize>
+            <weight>75</weight>
+            <italic>false</italic>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="cursor">
+           <cursorShape>IBeamCursor</cursorShape>
+          </property>
+          <property name="layoutDirection">
+           <enum>Qt::LeftToRight</enum>
+          </property>
+          <property name="autoFillBackground">
+           <bool>false</bool>
+          </property>
+          <property name="frameShape">
+           <enum>QFrame::NoFrame</enum>
+          </property>
+          <property name="smallDecimalPoint">
+           <bool>true</bool>
+          </property>
+          <property name="digitCount">
+           <number>8</number>
+          </property>
+          <property name="segmentStyle">
+           <enum>QLCDNumber::Flat</enum>
+          </property>
+          <property name="value" stdset="0">
+           <double>0.000000000000000</double>
+          </property>
+          <property name="intValue" stdset="0">
+           <number>0</number>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="7">
+         <widget class="QLCDNumber" name="lcdNumber_count">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>125</width>
+            <height>32</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>200</height>
+           </size>
+          </property>
+          <property name="cursor">
+           <cursorShape>IBeamCursor</cursorShape>
+          </property>
+          <property name="frameShape">
+           <enum>QFrame::NoFrame</enum>
+          </property>
+          <property name="smallDecimalPoint">
+           <bool>true</bool>
+          </property>
+          <property name="digitCount">
+           <number>8</number>
+          </property>
+          <property name="segmentStyle">
+           <enum>QLCDNumber::Flat</enum>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="4">
+         <widget class="QLCDNumber" name="lcdNumber_energy">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>125</width>
+            <height>32</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>200</height>
+           </size>
+          </property>
+          <property name="cursor">
+           <cursorShape>IBeamCursor</cursorShape>
+          </property>
+          <property name="frameShape">
+           <enum>QFrame::NoFrame</enum>
+          </property>
+          <property name="frameShadow">
+           <enum>QFrame::Sunken</enum>
+          </property>
+          <property name="smallDecimalPoint">
+           <bool>true</bool>
+          </property>
+          <property name="digitCount">
+           <number>8</number>
+          </property>
+          <property name="segmentStyle">
+           <enum>QLCDNumber::Flat</enum>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="6">
+         <widget class="QLabel" name="label_3">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Minimum" vsizetype="Maximum">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="text">
+           <string>计数：</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="5">
+         <widget class="QLabel" name="label_14">
+          <property name="text">
+           <string>KeV    </string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item row="5" column="0" colspan="5">
+       <widget class="QLabel" name="label_logger">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>9</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>日志</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0" colspan="5">
+       <widget class="Line" name="line">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="4" rowspan="3">
+       <layout class="QGridLayout" name="gridLayout_5">
+        <property name="sizeConstraint">
+         <enum>QLayout::SetDefaultConstraint</enum>
+        </property>
+        <item row="0" column="1">
+         <layout class="QVBoxLayout" name="verticalLayout_2">
+          <item>
+           <widget class="QTabWidget" name="tabWidget_top">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="autoFillBackground">
+             <bool>false</bool>
+            </property>
+            <property name="tabPosition">
+             <enum>QTabWidget::North</enum>
+            </property>
+            <property name="currentIndex">
+             <number>2</number>
+            </property>
+            <property name="movable">
+             <bool>true</bool>
+            </property>
+            <widget class="QWidget" name="tab_overview">
+             <attribute name="title">
+              <string>属性</string>
+             </attribute>
+             <layout class="QGridLayout" name="gridLayout_7">
+              <item row="0" column="0">
+               <widget class="QScrollArea" name="scrollArea">
+                <property name="frameShape">
+                 <enum>QFrame::NoFrame</enum>
+                </property>
+                <property name="frameShadow">
+                 <enum>QFrame::Plain</enum>
+                </property>
+                <property name="horizontalScrollBarPolicy">
+                 <enum>Qt::ScrollBarAsNeeded</enum>
+                </property>
+                <property name="sizeAdjustPolicy">
+                 <enum>QAbstractScrollArea::AdjustToContentsOnFirstShow</enum>
+                </property>
+                <property name="widgetResizable">
+                 <bool>true</bool>
+                </property>
+                <widget class="QWidget" name="scrollAreaWidgetContents">
+                 <property name="geometry">
+                  <rect>
+                   <x>0</x>
+                   <y>0</y>
+                   <width>351</width>
+                   <height>365</height>
+                  </rect>
+                 </property>
+                 <layout class="QGridLayout" name="gridLayout_15" rowstretch="0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0">
+                  <item row="21" column="1">
+                   <widget class="QLabel" name="label_max_count">
+                    <property name="text">
+                     <string>0</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="4" column="0" colspan="2">
+                   <widget class="Line" name="line_10">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="5" column="0">
+                   <widget class="QLabel" name="label_22">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="text">
+                     <string>测量时间（s）：</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="13" column="0">
+                   <widget class="QLabel" name="label_37">
+                    <property name="text">
+                     <string/>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="0">
+                   <widget class="QLabel" name="label_7">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="text">
+                     <string>文件：</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="18" column="0">
+                   <widget class="QLabel" name="label_33">
+                    <property name="text">
+                     <string/>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="7" column="0" colspan="2">
+                   <widget class="Line" name="line_9">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="22" column="0">
+                   <widget class="QLabel" name="label_10">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="text">
+                     <string>均值：</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="22" column="1">
+                   <widget class="QLabel" name="label_average_count">
+                    <property name="text">
+                     <string>0</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="17" column="0">
+                   <widget class="QLabel" name="label_35">
+                    <property name="text">
+                     <string/>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="0">
+                   <widget class="QLabel" name="label_24">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="text">
+                     <string>文件类型：</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="3" column="0">
+                   <widget class="QLabel" name="label_9">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="text">
+                     <string>光滑状态：</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="14" column="0">
+                   <widget class="QLabel" name="label_30">
+                    <property name="text">
+                     <string/>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="8" column="0">
+                   <widget class="QLabel" name="label_26">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="text">
+                     <string>概率密度分布：</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="12" column="0">
+                   <widget class="QLabel" name="label_38">
+                    <property name="text">
+                     <string/>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="16" column="0">
+                   <widget class="QLabel" name="label_34">
+                    <property name="text">
+                     <string/>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="6" column="0">
+                   <widget class="QLabel" name="label_23">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="text">
+                     <string>计数率（pps）:</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="3" column="1">
+                   <widget class="QLabel" name="label_smooth">
+                    <property name="text">
+                     <string>未光滑</string>
+                    </property>
+                    <property name="alignment">
+                     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="5" column="1">
+                   <widget class="QDoubleSpinBox" name="doubleSpinBox_measure_time">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="maximum">
+                     <double>1000000.000000000000000</double>
+                    </property>
+                    <property name="value">
+                     <double>200.000000000000000</double>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="6" column="1">
+                   <widget class="QDoubleSpinBox" name="doubleSpinBox_measure_rate">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="maximum">
+                     <double>1000000.000000000000000</double>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="1">
+                   <widget class="QLabel" name="label_type">
+                    <property name="text">
+                     <string>未知</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="2" column="1">
+                   <widget class="QLabel" name="label_energyXclac">
+                    <property name="text">
+                     <string>未校正</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="10" column="0">
+                   <widget class="QLabel" name="label_32">
+                    <property name="text">
+                     <string/>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="1">
+                   <widget class="QLabel" name="label_filename">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="text">
+                     <string>无</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="11" column="0">
+                   <widget class="QLabel" name="label_31">
+                    <property name="text">
+                     <string/>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="21" column="0">
+                   <widget class="QLabel" name="label_12">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="text">
+                     <string>最大计数：</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="20" column="1">
+                   <widget class="QLabel" name="label_total_count">
+                    <property name="text">
+                     <string>0</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="2" column="0">
+                   <widget class="QLabel" name="label_11">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="text">
+                     <string>能量刻度状态：</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="19" column="0" colspan="2">
+                   <widget class="Line" name="line_12">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="15" column="0">
+                   <widget class="QLabel" name="label_36">
+                    <property name="text">
+                     <string/>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="20" column="0">
+                   <widget class="QLabel" name="label_8">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="text">
+                     <string>总计数：</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="9" column="0" rowspan="10" colspan="2">
+                   <layout class="QVBoxLayout" name="verticalLayout_probGragh"/>
+                  </item>
+                 </layout>
+                </widget>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+            <widget class="QWidget" name="tab_info">
+             <attribute name="title">
+              <string>信息</string>
+             </attribute>
+             <layout class="QGridLayout" name="gridLayout_6">
+              <item row="0" column="0">
+               <widget class="QStackedWidget" name="stackedWidget_info">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="currentIndex">
+                 <number>2</number>
+                </property>
+                <widget class="QWidget" name="page_info_findPeek"/>
+                <widget class="QWidget" name="page_info_smooth"/>
+                <widget class="QWidget" name="page_mca2Pulse">
+                 <layout class="QGridLayout" name="gridLayout_11">
+                  <property name="leftMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="topMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="rightMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="bottomMargin">
+                   <number>0</number>
+                  </property>
+                  <item row="0" column="0">
+                   <widget class="QScrollArea" name="scrollArea_4">
+                    <property name="frameShape">
+                     <enum>QFrame::NoFrame</enum>
+                    </property>
+                    <property name="widgetResizable">
+                     <bool>true</bool>
+                    </property>
+                    <widget class="QWidget" name="scrollAreaWidgetContents_4">
+                     <property name="geometry">
+                      <rect>
+                       <x>0</x>
+                       <y>0</y>
+                       <width>368</width>
+                       <height>330</height>
+                      </rect>
+                     </property>
+                     <layout class="QGridLayout" name="gridLayout_9">
+                      <item row="4" column="1">
+                       <widget class="QLabel" name="label_r_square">
+                        <property name="text">
+                         <string>0.0</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item row="4" column="0">
+                       <widget class="QLabel" name="label_28">
+                        <property name="sizePolicy">
+                         <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
+                          <horstretch>0</horstretch>
+                          <verstretch>0</verstretch>
+                         </sizepolicy>
+                        </property>
+                        <property name="text">
+                         <string>R²（拟合优度）：</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item row="0" column="0" colspan="2">
+                       <widget class="QLabel" name="label_21">
+                        <property name="sizePolicy">
+                         <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+                          <horstretch>0</horstretch>
+                          <verstretch>0</verstretch>
+                         </sizepolicy>
+                        </property>
+                        <property name="text">
+                         <string>线性拟合图：</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item row="2" column="0" colspan="2">
+                       <layout class="QVBoxLayout" name="verticalLayout_linarGragh"/>
+                      </item>
+                      <item row="3" column="0" colspan="2">
+                       <widget class="QComboBox" name="comboBox_originalFile">
+                        <item>
+                         <property name="text">
+                          <string>选择原始能谱文件</string>
+                         </property>
+                        </item>
+                       </widget>
+                      </item>
+                     </layout>
+                    </widget>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+            <widget class="QWidget" name="tab">
+             <attribute name="title">
+              <string>脉冲</string>
+             </attribute>
+             <layout class="QVBoxLayout" name="verticalLayout_4">
+              <item>
+               <widget class="QScrollArea" name="scrollArea_5">
+                <property name="frameShape">
+                 <enum>QFrame::NoFrame</enum>
+                </property>
+                <property name="widgetResizable">
+                 <bool>true</bool>
+                </property>
+                <widget class="QWidget" name="scrollAreaWidgetContents_5">
+                 <property name="geometry">
+                  <rect>
+                   <x>0</x>
+                   <y>-66</y>
+                   <width>351</width>
+                   <height>396</height>
+                  </rect>
+                 </property>
+                 <layout class="QGridLayout" name="gridLayout_12">
+                  <item row="4" column="1">
+                   <widget class="QLabel" name="label_43">
+                    <property name="text">
+                     <string/>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="10" column="2" colspan="5">
+                   <widget class="QLabel" name="label_51">
+                    <property name="text">
+                     <string>脉冲时间间隔概率密度函数：</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="5" column="1">
+                   <widget class="QLabel" name="label_49">
+                    <property name="text">
+                     <string/>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="13" column="1">
+                   <widget class="QLabel" name="label_46">
+                    <property name="text">
+                     <string/>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="7" column="1">
+                   <widget class="QLabel" name="label_47">
+                    <property name="text">
+                     <string/>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="15" column="1">
+                   <widget class="QLabel" name="label_45">
+                    <property name="text">
+                     <string/>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="3" column="1">
+                   <widget class="QLabel" name="label_42">
+                    <property name="text">
+                     <string/>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="2" colspan="5">
+                   <widget class="QLabel" name="label_29">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="text">
+                     <string>脉冲浏览（模拟核脉冲）：</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="2" column="1">
+                   <widget class="QLabel" name="label_41">
+                    <property name="text">
+                     <string/>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="16" column="1">
+                   <widget class="QLabel" name="label_44">
+                    <property name="text">
+                     <string/>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="11" column="2" rowspan="8" colspan="5">
+                   <layout class="QVBoxLayout" name="verticalLayout_pulse_time_gragh"/>
+                  </item>
+                  <item row="8" column="1">
+                   <widget class="QLabel" name="label_40">
+                    <property name="text">
+                     <string/>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="11" column="1">
+                   <widget class="QLabel" name="label_52">
+                    <property name="text">
+                     <string/>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="6" column="1">
+                   <widget class="QLabel" name="label_50">
+                    <property name="text">
+                     <string/>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="2" rowspan="8" colspan="5">
+                   <layout class="QVBoxLayout" name="verticalLayout_pulse_gragh"/>
+                  </item>
+                  <item row="12" column="1">
+                   <widget class="QLabel" name="label_55">
+                    <property name="text">
+                     <string/>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="14" column="1">
+                   <widget class="QLabel" name="label_48">
+                    <property name="text">
+                     <string/>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="17" column="1">
+                   <widget class="QLabel" name="label_54">
+                    <property name="text">
+                     <string/>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="1">
+                   <widget class="QLabel" name="label_39">
+                    <property name="text">
+                     <string/>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="18" column="1">
+                   <widget class="QLabel" name="label_53">
+                    <property name="text">
+                     <string/>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="9" column="2">
+                   <widget class="QToolButton" name="toolButton_pulseRescale">
+                    <property name="text">
+                     <string/>
+                    </property>
+                    <property name="icon">
+                     <iconset resource="resources.qrc">
+                      <normaloff>:/图标/assets/bootstrap_reboot_640.svg</normaloff>:/图标/assets/bootstrap_reboot_640.svg</iconset>
+                    </property>
+                    <property name="autoRaise">
+                     <bool>true</bool>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="9" column="3">
+                   <widget class="QToolButton" name="toolButton_pulse_zoomIn">
+                    <property name="text">
+                     <string/>
+                    </property>
+                    <property name="icon">
+                     <iconset resource="resources.qrc">
+                      <normaloff>:/图标/assets/zoom_in_640.svg</normaloff>:/图标/assets/zoom_in_640.svg</iconset>
+                    </property>
+                    <property name="autoRaise">
+                     <bool>true</bool>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="9" column="4">
+                   <widget class="QToolButton" name="toolButton_pulse_zommOut">
+                    <property name="text">
+                     <string/>
+                    </property>
+                    <property name="icon">
+                     <iconset resource="resources.qrc">
+                      <normaloff>:/图标/assets/zoom_out_640.svg</normaloff>:/图标/assets/zoom_out_640.svg</iconset>
+                    </property>
+                    <property name="autoRaise">
+                     <bool>true</bool>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="9" column="6">
+                   <spacer name="horizontalSpacer_8">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>40</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                 </layout>
+                </widget>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </widget>
+          </item>
+          <item>
+           <widget class="QTabWidget" name="tabWidget_bottom">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="tabPosition">
+             <enum>QTabWidget::North</enum>
+            </property>
+            <property name="tabShape">
+             <enum>QTabWidget::Rounded</enum>
+            </property>
+            <property name="currentIndex">
+             <number>1</number>
+            </property>
+            <property name="elideMode">
+             <enum>Qt::ElideNone</enum>
+            </property>
+            <property name="usesScrollButtons">
+             <bool>true</bool>
+            </property>
+            <widget class="QWidget" name="tab_files">
+             <attribute name="title">
+              <string>文件</string>
+             </attribute>
+             <layout class="QVBoxLayout" name="verticalLayout_3">
+              <item>
+               <widget class="QScrollArea" name="scrollArea_3">
+                <property name="frameShape">
+                 <enum>QFrame::NoFrame</enum>
+                </property>
+                <property name="widgetResizable">
+                 <bool>true</bool>
+                </property>
+                <widget class="QWidget" name="scrollAreaWidgetContents_3">
+                 <property name="geometry">
+                  <rect>
+                   <x>0</x>
+                   <y>0</y>
+                   <width>368</width>
+                   <height>329</height>
+                  </rect>
+                 </property>
+                 <layout class="QGridLayout" name="gridLayout_10">
+                  <item row="1" column="2">
+                   <widget class="QToolButton" name="toolButton_file_close">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="toolTip">
+                     <string>关闭所选文件</string>
+                    </property>
+                    <property name="text">
+                     <string>关闭</string>
+                    </property>
+                    <property name="icon">
+                     <iconset resource="resources.qrc">
+                      <normaloff>:/图标/assets/minus_640.svg</normaloff>:/图标/assets/minus_640.svg</iconset>
+                    </property>
+                    <property name="autoRaise">
+                     <bool>true</bool>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="0" colspan="8">
+                   <widget class="QListWidget" name="listWidget_file">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Ignored" vsizetype="Expanding">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="dragEnabled">
+                     <bool>true</bool>
+                    </property>
+                    <property name="sortingEnabled">
+                     <bool>true</bool>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="5">
+                   <spacer name="horizontalSpacer_6">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>40</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                  <item row="1" column="4">
+                   <widget class="QToolButton" name="toolButton_file_hide">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="toolTip">
+                     <string>隐藏所选谱线</string>
+                    </property>
+                    <property name="text">
+                     <string>隐藏所选（H）</string>
+                    </property>
+                    <property name="icon">
+                     <iconset resource="resources.qrc">
+                      <normaloff>:/图标/assets/eye_slash_640.svg</normaloff>:/图标/assets/eye_slash_640.svg</iconset>
+                    </property>
+                    <property name="shortcut">
+                     <string>H</string>
+                    </property>
+                    <property name="checkable">
+                     <bool>true</bool>
+                    </property>
+                    <property name="autoRaise">
+                     <bool>true</bool>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="1">
+                   <widget class="QToolButton" name="toolButton_file_open">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="toolTip">
+                     <string>添加谱线文件</string>
+                    </property>
+                    <property name="text">
+                     <string>打开</string>
+                    </property>
+                    <property name="icon">
+                     <iconset resource="resources.qrc">
+                      <normaloff>:/图标/assets/plus_640.svg</normaloff>:/图标/assets/plus_640.svg</iconset>
+                    </property>
+                    <property name="autoRaise">
+                     <bool>true</bool>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="3">
+                   <widget class="Line" name="line_8">
+                    <property name="orientation">
+                     <enum>Qt::Vertical</enum>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+            <widget class="QWidget" name="tab_energyX">
+             <attribute name="title">
+              <string>能量刻度</string>
+             </attribute>
+             <layout class="QVBoxLayout" name="verticalLayout">
+              <item>
+               <widget class="QScrollArea" name="scrollArea_2">
+                <property name="frameShape">
+                 <enum>QFrame::NoFrame</enum>
+                </property>
+                <property name="widgetResizable">
+                 <bool>true</bool>
+                </property>
+                <widget class="QWidget" name="scrollAreaWidgetContents_2">
+                 <property name="geometry">
+                  <rect>
+                   <x>0</x>
+                   <y>0</y>
+                   <width>368</width>
+                   <height>329</height>
+                  </rect>
+                 </property>
+                 <layout class="QGridLayout" name="gridLayout_8">
+                  <item row="7" column="0" colspan="4">
+                   <widget class="QPushButton" name="pushButton_energyX_addCalcSpot">
+                    <property name="text">
+                     <string>添加校准点</string>
+                    </property>
+                    <property name="icon">
+                     <iconset resource="resources.qrc">
+                      <normaloff>:/图标/assets/plus_640.svg</normaloff>:/图标/assets/plus_640.svg</iconset>
+                    </property>
+                    <property name="autoDefault">
+                     <bool>true</bool>
+                    </property>
+                    <property name="default">
+                     <bool>true</bool>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="0" colspan="4">
+                   <widget class="QTextBrowser" name="textBrowser_energyX_notice">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Expanding" vsizetype="Maximum">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="autoFillBackground">
+                     <bool>true</bool>
+                    </property>
+                    <property name="frameShape">
+                     <enum>QFrame::NoFrame</enum>
+                    </property>
+                    <property name="sizeAdjustPolicy">
+                     <enum>QAbstractScrollArea::AdjustToContents</enum>
+                    </property>
+                    <property name="documentTitle">
+                     <string>提示</string>
+                    </property>
+                    <property name="html">
+                     <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;title&gt;提示&lt;/title&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'SimSun'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;添加&lt;/span&gt;&lt;span style=&quot; font-size:10pt; text-decoration: underline;&quot;&gt;不少于2个&lt;/span&gt;&lt;span style=&quot; font-size:10pt;&quot;&gt;的“道址-能量”对应关系的校准点即可生成线性道址-能量对应关系，能量刻度将可用，可以进行核素识别等高级分析功能。&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                    </property>
+                    <property name="textInteractionFlags">
+                     <set>Qt::NoTextInteraction</set>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="2" column="0" colspan="2">
+                   <widget class="QLabel" name="label_18">
+                    <property name="text">
+                     <string>校准点：</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="2" column="2">
+                   <spacer name="horizontalSpacer_3">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>40</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                  <item row="6" column="0">
+                   <widget class="QToolButton" name="toolButton_energyX_select">
+                    <property name="toolTip">
+                     <string>从图像选择</string>
+                    </property>
+                    <property name="text">
+                     <string/>
+                    </property>
+                    <property name="icon">
+                     <iconset resource="resources.qrc">
+                      <normaloff>:/图标/assets/cursor_640.svg</normaloff>:/图标/assets/cursor_640.svg</iconset>
+                    </property>
+                    <property name="checkable">
+                     <bool>true</bool>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="6" column="2" colspan="2">
+                   <widget class="QDoubleSpinBox" name="doubleSpinBox_energyX_energy_set">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="decimals">
+                     <number>4</number>
+                    </property>
+                    <property name="maximum">
+                     <double>10000.000000000000000</double>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="5" column="2">
+                   <widget class="QLabel" name="label_20">
+                    <property name="text">
+                     <string>能量：</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="2" column="3">
+                   <widget class="QPushButton" name="pushButton_energyX_remove">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="text">
+                     <string>移除所选</string>
+                    </property>
+                    <property name="icon">
+                     <iconset resource="resources.qrc">
+                      <normaloff>:/图标/assets/minus_640.svg</normaloff>:/图标/assets/minus_640.svg</iconset>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="6" column="1">
+                   <widget class="QSpinBox" name="spinBox_energyX_channel_set">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="minimum">
+                     <number>1</number>
+                    </property>
+                    <property name="maximum">
+                     <number>1024</number>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="3" column="0" colspan="4">
+                   <widget class="QListWidget" name="listWidget_energyX_calaSpots">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="sortingEnabled">
+                     <bool>true</bool>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="0" colspan="4">
+                   <widget class="Line" name="line_6">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="5" column="0" colspan="2">
+                   <widget class="QLabel" name="label_19">
+                    <property name="text">
+                     <string>道址：</string>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </item>
+      <item row="1" column="3" rowspan="3">
+       <widget class="Line" name="line_7">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0" rowspan="2" colspan="3">
+       <layout class="QHBoxLayout" name="gridLayout_Graph"/>
+      </item>
+      <item row="0" column="0" colspan="5">
+       <layout class="QGridLayout" name="gridLayout_3">
+        <item row="0" column="7">
+         <widget class="QToolButton" name="toolButton_zoomIn">
+          <property name="toolTip">
+           <string>放大（+）</string>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="icon">
+           <iconset resource="resources.qrc">
+            <normaloff>:/图标/assets/zoom_in_640.svg</normaloff>:/图标/assets/zoom_in_640.svg</iconset>
+          </property>
+          <property name="shortcut">
+           <string>=</string>
+          </property>
+          <property name="autoRaise">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="5">
+         <widget class="Line" name="line_4">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="13">
+         <widget class="QToolButton" name="toolButton_smooth">
+          <property name="toolTip">
+           <string>光滑工具（S）</string>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="icon">
+           <iconset resource="resources.qrc">
+            <normaloff>:/图标/assets/smooth_640.svg</normaloff>:/图标/assets/smooth_640.svg</iconset>
+          </property>
+          <property name="shortcut">
+           <string>S</string>
+          </property>
+          <property name="checkable">
+           <bool>true</bool>
+          </property>
+          <property name="autoExclusive">
+           <bool>false</bool>
+          </property>
+          <property name="autoRaise">
+           <bool>true</bool>
+          </property>
+          <property name="arrowType">
+           <enum>Qt::NoArrow</enum>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QToolButton" name="toolButton_openFile">
+          <property name="toolTip">
+           <string>打开谱线文件（Ctrl+O）</string>
+          </property>
+          <property name="whatsThis">
+           <string>打开谱线文件（Ctrl+O）</string>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="icon">
+           <iconset resource="resources.qrc">
+            <normaloff>:/图标/assets/open_file_640.svg</normaloff>:/图标/assets/open_file_640.svg</iconset>
+          </property>
+          <property name="shortcut">
+           <string>Ctrl+O</string>
+          </property>
+          <property name="checkable">
+           <bool>false</bool>
+          </property>
+          <property name="popupMode">
+           <enum>QToolButton::DelayedPopup</enum>
+          </property>
+          <property name="toolButtonStyle">
+           <enum>Qt::ToolButtonIconOnly</enum>
+          </property>
+          <property name="autoRaise">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="9">
+         <widget class="Line" name="line_2">
+          <property name="lineWidth">
+           <number>1</number>
+          </property>
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="14">
+         <widget class="Line" name="line_3">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="6">
+         <widget class="QToolButton" name="toolButton_resetFrame">
+          <property name="toolTip">
+           <string>重置画幅（Ctrl+R）</string>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="icon">
+           <iconset resource="resources.qrc">
+            <normaloff>:/图标/assets/bootstrap_reboot_640.svg</normaloff>:/图标/assets/bootstrap_reboot_640.svg</iconset>
+          </property>
+          <property name="shortcut">
+           <string>Ctrl+R</string>
+          </property>
+          <property name="autoRaise">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="11">
+         <widget class="QToolButton" name="toolButton_section">
+          <property name="toolTip">
+           <string>选择工具（B）</string>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="icon">
+           <iconset resource="resources.qrc">
+            <normaloff>:/图标/assets/text_curse_640.svg</normaloff>:/图标/assets/text_curse_640.svg</iconset>
+          </property>
+          <property name="shortcut">
+           <string>B</string>
+          </property>
+          <property name="checkable">
+           <bool>true</bool>
+          </property>
+          <property name="autoRaise">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="15">
+         <widget class="QToolButton" name="toolButton_genPulse">
+          <property name="toolTip">
+           <string>核脉冲幅度数据工具（G）</string>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="icon">
+           <iconset resource="resources.qrc">
+            <normaloff>:/图标/assets/generate_timeGraph_640.svg</normaloff>:/图标/assets/generate_timeGraph_640.svg</iconset>
+          </property>
+          <property name="shortcut">
+           <string>G</string>
+          </property>
+          <property name="checkable">
+           <bool>true</bool>
+          </property>
+          <property name="autoRaise">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="12">
+         <widget class="QToolButton" name="toolButton_findPeek">
+          <property name="toolTip">
+           <string>寻峰工具（F）</string>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="icon">
+           <iconset resource="resources.qrc">
+            <normaloff>:/图标/assets/find_peek_640.svg</normaloff>:/图标/assets/find_peek_640.svg</iconset>
+          </property>
+          <property name="shortcut">
+           <string>F</string>
+          </property>
+          <property name="checkable">
+           <bool>true</bool>
+          </property>
+          <property name="autoExclusive">
+           <bool>false</bool>
+          </property>
+          <property name="autoRaise">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="10">
+         <widget class="QToolButton" name="toolButton_select">
+          <property name="toolTip">
+           <string>指针工具（Space）</string>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="icon">
+           <iconset resource="resources.qrc">
+            <normaloff>:/图标/assets/cursor_640.svg</normaloff>:/图标/assets/cursor_640.svg</iconset>
+          </property>
+          <property name="shortcut">
+           <string>Space</string>
+          </property>
+          <property name="checkable">
+           <bool>true</bool>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+          <property name="autoRaise">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="18">
+         <widget class="Line" name="line_5">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="8">
+         <widget class="QToolButton" name="toolButton_zoomOut">
+          <property name="toolTip">
+           <string>缩小（-）</string>
+          </property>
+          <property name="text">
+           <string/>
+          </property>
+          <property name="icon">
+           <iconset resource="resources.qrc">
+            <normaloff>:/图标/assets/zoom_out_640.svg</normaloff>:/图标/assets/zoom_out_640.svg</iconset>
+          </property>
+          <property name="shortcut">
+           <string>-</string>
+          </property>
+          <property name="autoRaise">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="19">
+         <widget class="QStackedWidget" name="stackedWidget_tool">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Maximum">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="lineWidth">
+           <number>0</number>
+          </property>
+          <property name="currentIndex">
+           <number>4</number>
+          </property>
+          <widget class="QWidget" name="page_void"/>
+          <widget class="QWidget" name="page_section">
+           <layout class="QHBoxLayout" name="horizontalLayout_5">
+            <item>
+             <widget class="QLabel" name="label_15">
+              <property name="text">
+               <string>起始（ch）：</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QSpinBox" name="spinBox_section_start">
+              <property name="minimum">
+               <number>1</number>
+              </property>
+              <property name="maximum">
+               <number>2048</number>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_16">
+              <property name="text">
+               <string>  结束（ch）：</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QSpinBox" name="spinBox_section_end">
+              <property name="minimum">
+               <number>1</number>
+              </property>
+              <property name="maximum">
+               <number>2048</number>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_2">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="page_smooth">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <layout class="QHBoxLayout" name="horizontalLayout">
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="QLabel" name="label_6">
+              <property name="font">
+               <font>
+                <pointsize>9</pointsize>
+               </font>
+              </property>
+              <property name="text">
+               <string>光滑算法：</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QComboBox" name="comboBox_smoothAlgo">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>120</width>
+                <height>0</height>
+               </size>
+              </property>
+              <item>
+               <property name="text">
+                <string>平均移动法</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>重心法</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>最小二乘法</string>
+               </property>
+              </item>
+             </widget>
+            </item>
+            <item>
+             <widget class="QStackedWidget" name="stackedWidget_tool_smooth">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="currentIndex">
+               <number>1</number>
+              </property>
+              <widget class="QWidget" name="page_smooth_average">
+               <layout class="QHBoxLayout" name="horizontalLayout_3">
+                <property name="topMargin">
+                 <number>0</number>
+                </property>
+                <property name="bottomMargin">
+                 <number>0</number>
+                </property>
+                <item>
+                 <widget class="QLabel" name="label_5">
+                  <property name="font">
+                   <font>
+                    <pointsize>9</pointsize>
+                   </font>
+                  </property>
+                  <property name="text">
+                   <string>窗口大小：</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QSpinBox" name="spinBox_smooth_avg">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="minimum">
+                   <number>3</number>
+                  </property>
+                  <property name="maximum">
+                   <number>99</number>
+                  </property>
+                  <property name="singleStep">
+                   <number>2</number>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
+              <widget class="QWidget" name="page_smooth_gravity">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <layout class="QHBoxLayout" name="horizontalLayout_4">
+                <item>
+                 <widget class="QLabel" name="label_17">
+                  <property name="text">
+                   <string>点数：</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QSpinBox" name="spinBox_smooth_gra">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="minimum">
+                   <number>3</number>
+                  </property>
+                  <property name="singleStep">
+                   <number>2</number>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
+              <widget class="QWidget" name="page_smooth_LSM"/>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="pushButton_smooth_yes">
+              <property name="text">
+               <string/>
+              </property>
+              <property name="icon">
+               <iconset resource="resources.qrc">
+                <normaloff>:/图标/assets/check_640.svg</normaloff>:/图标/assets/check_640.svg</iconset>
+              </property>
+              <property name="shortcut">
+               <string>Return</string>
+              </property>
+              <property name="flat">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="pushButton_smooth_no">
+              <property name="text">
+               <string/>
+              </property>
+              <property name="icon">
+               <iconset resource="resources.qrc">
+                <normaloff>:/图标/assets/x_640.svg</normaloff>:/图标/assets/x_640.svg</iconset>
+              </property>
+              <property name="flat">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="page_findPeek">
+           <layout class="QHBoxLayout" name="horizontalLayout_2">
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
+            <item>
+             <widget class="QLabel" name="label_2">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="text">
+               <string>寻峰算法：</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QComboBox" name="comboBox_findPeek_algo">
+              <property name="minimumSize">
+               <size>
+                <width>120</width>
+                <height>0</height>
+               </size>
+              </property>
+              <item>
+               <property name="text">
+                <string>简单比较法</string>
+               </property>
+              </item>
+              <item>
+               <property name="text">
+                <string>高斯乘积法</string>
+               </property>
+              </item>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="pushButton_findPeek_yes">
+              <property name="text">
+               <string/>
+              </property>
+              <property name="icon">
+               <iconset resource="resources.qrc">
+                <normaloff>:/图标/assets/check_640.svg</normaloff>:/图标/assets/check_640.svg</iconset>
+              </property>
+              <property name="shortcut">
+               <string>Return</string>
+              </property>
+              <property name="flat">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="pushButton_findPeek_no">
+              <property name="text">
+               <string/>
+              </property>
+              <property name="icon">
+               <iconset resource="resources.qrc">
+                <normaloff>:/图标/assets/x_640.svg</normaloff>:/图标/assets/x_640.svg</iconset>
+              </property>
+              <property name="flat">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_5">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="page_gen_pulse">
+           <layout class="QHBoxLayout" name="horizontalLayout_6">
+            <item>
+             <widget class="QLabel" name="label_25">
+              <property name="text">
+               <string>计数率（pps）：</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QDoubleSpinBox" name="doubleSpinBox_pulse_csp_rate">
+              <property name="maximum">
+               <double>1000000.000000000000000</double>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_27">
+              <property name="text">
+               <string>测量时间（s）：</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QDoubleSpinBox" name="doubleSpinBox_pulse_measure_time">
+              <property name="maximum">
+               <double>1000000.000000000000000</double>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="Line" name="line_11">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="pushButton_export_pulse">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="text">
+               <string>生成并导出</string>
+              </property>
+              <property name="icon">
+               <iconset resource="resources.qrc">
+                <normaloff>:/图标/assets/export_640.svg</normaloff>:/图标/assets/export_640.svg</iconset>
+              </property>
+              <property name="shortcut">
+               <string>Return</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QCheckBox" name="checkBox_pulse_addTimeAxis">
+              <property name="text">
+               <string>脉冲带绝对时间</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QCheckBox" name="checkBox_pulse_openLater">
+              <property name="text">
+               <string>导出后打开</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_7">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </widget>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1620</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menu">
+    <property name="title">
+     <string>文件</string>
+    </property>
+    <addaction name="action_openFile"/>
+    <addaction name="separator"/>
+    <addaction name="action_exportLog"/>
+   </widget>
+   <widget class="QMenu" name="menu_2">
+    <property name="title">
+     <string>工具</string>
+    </property>
+    <addaction name="action_smooth"/>
+    <addaction name="action_findPeek"/>
+    <addaction name="separator"/>
+    <addaction name="action_calabration"/>
+    <addaction name="action_calabrateEngergyX"/>
+   </widget>
+   <widget class="QMenu" name="menu_3">
+    <property name="title">
+     <string>编辑</string>
+    </property>
+    <addaction name="action_zoomIn"/>
+    <addaction name="action_zoomOut"/>
+    <addaction name="separator"/>
+    <addaction name="action_resetFrame"/>
+    <addaction name="action_restore_file"/>
+   </widget>
+   <widget class="QMenu" name="menu_4">
+    <property name="title">
+     <string>显示</string>
+    </property>
+    <addaction name="action_showNuclide"/>
+   </widget>
+   <widget class="QMenu" name="menu_5">
+    <property name="title">
+     <string>帮助</string>
+    </property>
+    <addaction name="action_hotKeyHelp"/>
+   </widget>
+   <addaction name="menu"/>
+   <addaction name="menu_3"/>
+   <addaction name="menu_2"/>
+   <addaction name="menu_4"/>
+   <addaction name="menu_5"/>
+  </widget>
+  <action name="action_openFile">
+   <property name="text">
+    <string>打开</string>
+   </property>
+  </action>
+  <action name="action_smooth">
+   <property name="text">
+    <string>光滑</string>
+   </property>
+  </action>
+  <action name="action_zoomIn">
+   <property name="text">
+    <string>放大</string>
+   </property>
+  </action>
+  <action name="action_zoomOut">
+   <property name="text">
+    <string>缩小</string>
+   </property>
+  </action>
+  <action name="action_findPeek">
+   <property name="text">
+    <string>寻峰</string>
+   </property>
+  </action>
+  <action name="action_showNuclide">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>显示核素</string>
+   </property>
+  </action>
+  <action name="action_resetFrame">
+   <property name="text">
+    <string>重置画面</string>
+   </property>
+  </action>
+  <action name="action_calabration">
+   <property name="text">
+    <string>谱漂矫正</string>
+   </property>
+  </action>
+  <action name="action_hotKeyHelp">
+   <property name="text">
+    <string>快捷键说明</string>
+   </property>
+  </action>
+  <action name="action_exportLog">
+   <property name="text">
+    <string>导出日志</string>
+   </property>
+  </action>
+  <action name="action_calabrateEngergyX">
+   <property name="text">
+    <string>能量刻度校准</string>
+   </property>
+  </action>
+  <action name="action_energyX">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>能量刻度</string>
+   </property>
+  </action>
+  <action name="action_restore_file">
+   <property name="text">
+    <string>还原谱线</string>
+   </property>
+  </action>
+ </widget>
+ <tabstops>
+  <tabstop>toolButton_openFile</tabstop>
+  <tabstop>toolButton_resetFrame</tabstop>
+  <tabstop>toolButton_zoomIn</tabstop>
+  <tabstop>toolButton_zoomOut</tabstop>
+  <tabstop>toolButton_select</tabstop>
+  <tabstop>toolButton_section</tabstop>
+  <tabstop>toolButton_findPeek</tabstop>
+  <tabstop>toolButton_smooth</tabstop>
+  <tabstop>tabWidget_top</tabstop>
+  <tabstop>tabWidget_bottom</tabstop>
+  <tabstop>scrollArea_2</tabstop>
+  <tabstop>textBrowser_energyX_notice</tabstop>
+  <tabstop>pushButton_energyX_remove</tabstop>
+  <tabstop>toolButton_energyX_select</tabstop>
+  <tabstop>spinBox_energyX_channel_set</tabstop>
+  <tabstop>doubleSpinBox_energyX_energy_set</tabstop>
+  <tabstop>pushButton_energyX_addCalcSpot</tabstop>
+  <tabstop>spinBox_section_end</tabstop>
+  <tabstop>spinBox_section_start</tabstop>
+  <tabstop>spinBox_smooth_avg</tabstop>
+  <tabstop>pushButton_findPeek_no</tabstop>
+  <tabstop>pushButton_findPeek_yes</tabstop>
+  <tabstop>pushButton_smooth_yes</tabstop>
+  <tabstop>spinBox_smooth_gra</tabstop>
+  <tabstop>listWidget_energyX_calaSpots</tabstop>
+  <tabstop>pushButton_smooth_no</tabstop>
+  <tabstop>comboBox_smoothAlgo</tabstop>
+  <tabstop>comboBox_findPeek_algo</tabstop>
+ </tabstops>
+ <resources>
+  <include location="resources.qrc"/>
+ </resources>
+ <connections>
+  <connection>
+   <sender>comboBox_smoothAlgo</sender>
+   <signal>activated(int)</signal>
+   <receiver>stackedWidget_tool_smooth</receiver>
+   <slot>setCurrentIndex(int)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>447</x>
+     <y>136</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>361</x>
+     <y>142</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_smooth_no</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>toolButton_smooth</receiver>
+   <slot>setChecked(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>401</x>
+     <y>139</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>254</x>
+     <y>144</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>pushButton_findPeek_no</sender>
+   <signal>clicked(bool)</signal>
+   <receiver>toolButton_findPeek</receiver>
+   <slot>setChecked(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>401</x>
+     <y>139</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>225</x>
+     <y>144</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

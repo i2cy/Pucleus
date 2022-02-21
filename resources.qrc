@@ -1,0 +1,24 @@
+<RCC>
+  <qresource prefix="图标">
+    <file>assets/caret_up_square_640.svg</file>
+    <file>assets/export_640.svg</file>
+    <file>assets/generate_AGraph_640.svg</file>
+    <file>assets/generate_timeGraph_640.svg</file>
+    <file>assets/eye_slash_640.svg</file>
+    <file>assets/minus_640.svg</file>
+    <file>assets/plus_640.svg</file>
+    <file>assets/x_square_640.svg</file>
+    <file>assets/cursor_640.svg</file>
+    <file>assets/diamond_fill_640.svg</file>
+    <file>assets/check_640.svg</file>
+    <file>assets/x_640.svg</file>
+    <file>assets/bootstrap_reboot_640.svg</file>
+    <file>assets/find_peek_640.svg</file>
+    <file>assets/generate_probGraph_640.svg</file>
+    <file>assets/open_file_640.svg</file>
+    <file>assets/smooth_640.svg</file>
+    <file>assets/text_curse_640.svg</file>
+    <file>assets/zoom_in_640.svg</file>
+    <file>assets/zoom_out_640.svg</file>
+  </qresource>
+</RCC>
