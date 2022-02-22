@@ -308,6 +308,7 @@ class MCA(object):
     def to_pulses(self, total_pulses=None):
         if total_pulses is None:
             total_pulses = int(self.sum())
+        total_pulses = int(total_pulses)
         np.random.seed(int(time.time()))
         accu = self.to_accumulation()
         rand = np.random.randint(0, accu.max(), size=(total_pulses,))
@@ -358,8 +359,10 @@ class MCA(object):
         #print(pulses.ndim, pulses.ndim)
         res = np.dstack((pulses, time_res)).astype(np.uint32)
         res = np.squeeze(res)
+        ret = Pulses(res)
+        ret.total_time = total_time
 
-        return Pulses(res)
+        return ret
 
     def from_pulses(self, pulses, max_channel=1024):
         if isinstance(pulses, list) or isinstance(pulses, tuple) or isinstance(pulses, np.ndarray):
@@ -450,6 +453,8 @@ class Pulses(object):
 
             total_time = data[11:14]  # 3B 测量时间（单位s）
             self.total_time = int().from_bytes(total_time, "little", signed=False)
+            # print(self.total_time)
+            # print(self.__len__)
 
             enX_a = data[14:18]  # 4B 能量刻度参数A
             self.energyX_a = int().from_bytes(enX_a, "little", signed=True) / 1000000
@@ -494,18 +499,18 @@ class Pulses(object):
         data += channels
 
         total_time = self.total_time
-        if head == b"CHT":
-            total_time = self.data[-1, 1] / 1000
+        if head == b"CHT" and not self.total_time:
+            total_time = self.data[:, 1].sum() / 1000000
             if total_time % 1:
                 total_time = total_time // 1 + 1
-        total_time = int(total_time)
-        total_time = total_time.to_bytes(3, "little", signed=False)
+
+        total_time = int(total_time).to_bytes(3, "little", signed=False)
         data += total_time
 
-        enX_a = self.energyX_a.to_bytes(4, "little", signed=False)
+        enX_a = int(self.energyX_a).to_bytes(4, "little", signed=False)
         data += enX_a
 
-        enX_b = self.energyX_b.to_bytes(4, "little", signed=False)
+        enX_b = int(self.energyX_b).to_bytes(4, "little", signed=False)
         data += enX_b
 
         data_raw = self.data.astype(np.uint32).tobytes()

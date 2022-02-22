@@ -8,7 +8,6 @@
 
 import sys
 import os
-import threading
 import time
 import pyqtgraph as pg
 import numpy as np
@@ -16,129 +15,14 @@ import random
 from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, \
     QSizePolicy, QListWidgetItem, QMessageBox, QFrame
 from PyQt5.QtGui import QIcon, QImage, QPixmap, QKeyEvent, QMouseEvent
-from PyQt5.QtCore import Qt, QSize
+from PyQt5.QtCore import Qt, QSize, QThread
 from i2cylib.utils.logger.logger import Logger
 from mainWindow import Ui_MainWindow
 from modules.mca import MCA, Pulses
-from modules.utils import ColorManager, get_R_square
+from modules.utils import ColorManager, get_R_square, ModLogger, Mod_PlotWidget
 import modules.smooth as smooth
 from modules.energy_axis import linear_regression
-
-
-class ModLogger:
-
-    def __init__(self, level="DEBUG"):
-        self.logger = Logger(level=level, echo=False)
-        self.log_buffer = []
-        self.qlabel_object = None
-
-        self.ui_object = None
-
-    def bind_QLabel(self, ui_object):
-        assert isinstance(ui_object, Ui_MainWindow)
-        self.ui_object = ui_object
-        self.qlabel_object = ui_object.label_logger
-
-    def export_logs(self, filename):
-        """
-        save logs to file
-
-        :param filename: str, target log path
-        :return: bool, action status
-        """
-        status = False
-        try:
-            with open(filename, "w") as f:
-                for i in self.log_buffer:
-                    f.write(i)
-                f.close()
-            status = True
-        except Exception:
-            pass
-
-        return status
-
-    def DEBUG(self, msg):
-        ret = self.logger.DEBUG(msg)
-        if self.qlabel_object is not None:
-            self.qlabel_object.setText(msg)
-        self.log_buffer.append(ret)
-        return ret
-
-    def INFO(self, msg):
-        ret = self.logger.INFO(msg)
-        if self.qlabel_object is not None:
-            self.qlabel_object.setText(msg)
-        self.log_buffer.append(ret)
-        return ret
-
-    def WARNING(self, msg):
-        ret = self.logger.WARNING(msg)
-        if self.qlabel_object is not None:
-            self.qlabel_object.setText(msg)
-        self.log_buffer.append(ret)
-        return ret
-
-    def ERROR(self, msg):
-        ret = self.logger.ERROR(msg)
-        if self.qlabel_object is not None:
-            self.qlabel_object.setText(msg)
-        self.log_buffer.append(ret)
-        return ret
-
-    def CRITICAL(self, msg):
-        ret = self.logger.CRITICAL(msg)
-        if self.qlabel_object is not None:
-            self.qlabel_object.setText(msg)
-        self.log_buffer.append(ret)
-        return ret
-
-
-class Mod_PlotWidget(pg.PlotWidget):
-
-    def __init__(self, *key, **kwargs):
-        super(Mod_PlotWidget, self).__init__(*key, **kwargs)
-
-        self.post_mousePressEvent_handler = self.void_func
-        self.post_mouseReleaseEvent_handler = self.void_func
-
-        self.post_keyPressEvent = self.void_func
-        self.post_keyReleaseEvent = self.void_func
-
-    def void_func(self, *key, **kwargs):
-        pass
-
-    def bind_mousePressEvent(self, func):
-        self.post_mousePressEvent_handler = func
-
-    def bind_mouseReleaseEvent(self, func):
-        self.post_mouseReleaseEvent_handler = func
-
-    def bind_keyPressEvent(self, func):
-        self.post_keyPressEvent = func
-
-    def bind_keyReleaseEvent(self, func):
-        self.post_keyReleaseEvent = func
-
-    def mousePressEvent(self, ev):
-        super(Mod_PlotWidget, self).mousePressEvent(ev)
-        # print("pressed,", ev.pos())
-        self.post_mousePressEvent_handler(ev)
-
-    def mouseReleaseEvent(self, ev):
-        super(Mod_PlotWidget, self).mouseReleaseEvent(ev)
-        # print("released", ev.pos())
-        self.post_mouseReleaseEvent_handler(ev)
-
-    def keyPressEvent(self, ev):
-        super(Mod_PlotWidget, self).keyPressEvent(ev)
-        # print(ev)
-        self.post_keyPressEvent(ev)
-
-    def keyReleaseEvent(self, ev):
-        super(Mod_PlotWidget, self).keyReleaseEvent(ev)
-        # print(ev)
-        self.post_keyReleaseEvent(ev)
+from modules.threads import PulseGenThread, UpdatePulseInfoThread, TestThread
 
 
 class MCA_MainUI(QMainWindow, Ui_MainWindow, QApplication):
@@ -361,6 +245,14 @@ class MCA_MainUI(QMainWindow, Ui_MainWindow, QApplication):
         self.K_energy_a = 0
         self.K_energy_b = 0
 
+        self.thread_pulse_generator = PulseGenThread(self)
+        self.thread_pulse_info_updater = UpdatePulseInfoThread(self)
+
+        self.thread_pulse_generator.setParent(self)
+        self.thread_pulse_info_updater.setParent(self)
+
+        self.thread_pulse_info_updater.draw.connect(self.do_draw_pulse)
+
     def static_channel_2_energy(self, channel, a=None, b=None):
         if a is None:
             a = self.K_energy_a
@@ -428,7 +320,6 @@ class MCA_MainUI(QMainWindow, Ui_MainWindow, QApplication):
                         self.doubleSpinBox_measure_time.setValue(total_count / self.doubleSpinBox_measure_rate.value())
 
             self.label_filename.setText(ele[self.file_unpack_dict["filename"]])
-
             self.label_smooth.setText(smooth_methods)
             if self.flag_energyX_available:
                 self.label_energyXclac.setText("已校正, a:{:.4f}, b:{:.4f}".format(
@@ -600,19 +491,8 @@ class MCA_MainUI(QMainWindow, Ui_MainWindow, QApplication):
                 self.tabWidget_top.setTabVisible(2, True)
                 self.stackedWidget_info.setCurrentIndex(3)
         else:
-            if not self.toolButton_genPulse.isChecked():
-                self.tabWidget_top.setTabVisible(1, False)
-                self.tabWidget_top.setTabVisible(2, False)
-
-    def static_convert_pulses(self, pulses):
-        x = pulses.get_abs_time()
-        x0 = x - 0.000001
-        x1 = x + 0.000001
-        yex = np.zeros(len(x) * 2)
-        x = np.concatenate((x, x0, x1))
-        y = np.concatenate((pulses[:, 0], yex))
-
-        return x, y
+            self.tabWidget_top.setTabVisible(1, False)
+            self.tabWidget_top.setTabVisible(2, False)
 
     def static_infoTab_genPulse_update(self):
         original_filename = self.comboBox_originalFile.currentText()
@@ -640,32 +520,31 @@ class MCA_MainUI(QMainWindow, Ui_MainWindow, QApplication):
         self.linearReg_plot_window.setXRange(0, original_plot.max())
         self.linearReg_plot_window.setYRange(0, current_plot.max())
 
-    def do_draw_pulse(self):
-        # draw pulse tab
-        pulse = self.static_get_current_curve()
-        if pulse is None:
-            return
-        pulse = pulse[self.file_unpack_dict["pulse"]]
-        if not isinstance(pulse, Pulses):
-            #print("pulse is ", pulse)
-            return
+    def static_topBar_update(self):
+        csp_rate = self.doubleSpinBox_measure_rate.value()
+        total_time = self.doubleSpinBox_measure_time.value()
 
-        if pulse.data.ndim != 2:
-            #print("ndim is ", pulse.data.ndim)
-            return
+        self.doubleSpinBox_pulse_csp_rate.setValue(csp_rate)
+        self.doubleSpinBox_pulse_measure_time.setValue(total_time)
 
-        abs_time = pulse.data[:, 1] / 10**6
-        avg_time = abs_time.mean()
-        total_time = abs_time.sum()
+    def static_update_pulseInfo(self):
+        if not self.thread_pulse_info_updater.isFinished():
+            self.thread_pulse_info_updater.terminate()
+        self.thread_pulse_info_updater.set_curve(self.static_get_current_curve())
+        self.thread_pulse_info_updater.start()
 
-        #print(avg_time)
+    def do_draw_pulse(self, data):
+        total_time = data[0][-1]
+        self.pulse_plot_window.plotItem.getViewBox().setLimits(xMin=-2,
+                                                               xMax=total_time + 2,
+                                                               yMin=-9, yMax=1024 + 9)
 
-        self.pulse_plot_window.plotItem.getViewBox().setLimits(xMin=-2 * avg_time,
-                                                               xMax=total_time + 2 * avg_time,
-                                                               yMin=-9, yMax=1024+9)
-
-        self.pulse_plot = self.pulse_plot_window.plot(*self.static_convert_pulses(pulse),
-                                                      pen=pg.mkPen(color=(200, 50, 0, 50), width=0.5))
+        self.pulse_plot = self.pulse_plot_window.plot(*data,
+                                                      pen=pg.mkPen(color=(255, 200, 0, 80),
+                                                                   width=0.5,
+                                                                   stepMode="left")
+                                                      )
+        self.logger.INFO("[pulse] 脉冲预览图已绘制")
 
     def do_draw_section(self, section=None):
         if section is None:
@@ -698,7 +577,11 @@ class MCA_MainUI(QMainWindow, Ui_MainWindow, QApplication):
         if not self.flag_file_opened:
             return
 
+        if filename is None:
+            return
+
         self.flag_pulse_generating = True
+        # print(filename)
 
         self.logger.INFO("[pulse] 正在生成和脉冲数据，请稍后")
 
@@ -712,8 +595,8 @@ class MCA_MainUI(QMainWindow, Ui_MainWindow, QApplication):
 
         pulse.total_time = total_time
         if self.flag_energyX_available:
-            pulse.energyX_a = self.K_energy_a
-            pulse.energyX_b = self.K_energy_b
+            pulse.energyX_a = int(self.K_energy_a * 1000000)
+            pulse.energyX_b = int(self.K_energy_b * 1000000)
         pulse.to_file(filename)
 
         if open_later:
@@ -1019,9 +902,10 @@ class MCA_MainUI(QMainWindow, Ui_MainWindow, QApplication):
                     self.toolButton_file_hide.setChecked(True)
 
         self.static_infoTab_genPulse_update()
+        self.static_topBar_update()
         self.static_flush_graph()
         self.static_update_overview()
-        self.do_draw_pulse()
+        self.static_update_pulseInfo()
 
     def on_mouse_clicked(self, evt):
         evt = evt[0]
@@ -1110,26 +994,29 @@ class MCA_MainUI(QMainWindow, Ui_MainWindow, QApplication):
         if not self.flag_file_opened:
             return
         if self.flag_pulse_generating:
-            pop_notice("提示", "核脉冲生成正在进行，请勿重复点击")
+            pop_notice(QMessageBox.Warning, "提示", "核脉冲生成正在进行，请勿重复点击")
             return
 
         csp_rate = self.doubleSpinBox_pulse_csp_rate.value()
-        measure_time = self.doubleSpinBox_measure_time.value()
+        measure_time = self.doubleSpinBox_pulse_measure_time.value()
         timed = self.checkBox_pulse_addTimeAxis.isChecked()
         open_after = self.checkBox_pulse_openLater.isChecked()
 
         filenames = QFileDialog.getSaveFileName(caption="保存",
                                                 filter="核脉冲文件 (*.tps);;"
                                                        "所有文件类型 (*)",
-                                                parent=self)[0]
+                                                parent=self)
 
-        if filenames is None:
+        filenames = filenames[0]
+
+        if not filenames:
             return
 
-        threading.Thread(target=self.do_generate_pulse, args=(filenames, csp_rate,
-                                                              measure_time, timed,
-                                                              open_after
-                                                              )).start()
+        self.thread_pulse_generator.set_values(filenames, csp_rate,
+                                               measure_time, timed,
+                                               open_after
+                                               )
+        self.thread_pulse_generator.start()
 
 
 def pop_notice(type, title, msg):
@@ -1150,4 +1037,5 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
     ui = MCA_MainUI()
     ui.show()
-    sys.exit(app.exec_())
+    extco = app.exec_()
+    sys.exit(extco)
