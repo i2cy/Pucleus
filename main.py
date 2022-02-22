@@ -160,6 +160,7 @@ class MCA_MainUI(QMainWindow, Ui_MainWindow, QApplication):
         self.thread_flags = {}
 
         self.tabWidget_top.setTabVisible(1, False)
+        self.tabWidget_top.setTabVisible(2, False)
 
         # qt connection init
         self.action_exportLog.triggered.connect(self.on_action_exportLog)
@@ -192,6 +193,8 @@ class MCA_MainUI(QMainWindow, Ui_MainWindow, QApplication):
         self.pushButton_smooth_no.clicked.connect(self.on_tool_smooth_clicked)
         self.pushButton_smooth_yes.clicked.connect(self.on_tool_smooth_yes_clicked)
         self.pushButton_findPeek_no.clicked.connect(self.on_tool_findPeek_clicked)
+
+        self.pushButton_export_pulse.clicked.connect(self.on_export_pulse_buttom_clicked)
 
         self.spinBox_section_start.valueChanged.connect(self.on_section_spinbox_start_changed)
         self.spinBox_section_end.valueChanged.connect(self.on_section_spinbox_end_changed)
@@ -243,6 +246,25 @@ class MCA_MainUI(QMainWindow, Ui_MainWindow, QApplication):
 
         self.verticalLayout_linarGragh.addWidget(self.linearReg_plot_window)
         self.setLayout(self.verticalLayout_linarGragh)
+
+        # pulse graph init
+        self.pulse_plot_window = Mod_PlotWidget(self)
+        sizePolicy = QSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.MinimumExpanding)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.centralwidget.sizePolicy().hasHeightForWidth())
+        self.pulse_plot_window.setSizePolicy(sizePolicy)
+        self.pulse_plot_window.plotItem.setLabels(left="幅度(电压)", bottom="时间")
+        self.pulse_plot_window.plotItem.showGrid(x=False, y=True, alpha=0.5)
+        self.pulse_plot_window.plotItem.showAxes("top")
+        self.pulse_plot_window.plotItem.showAxes("right")
+        self.pulse_plot_window.setBackground(None)
+        self.pulse_plot_window.setMouseEnabled(True, True)
+
+        self.verticalLayout_pulse_gragh.addWidget(self.pulse_plot_window)
+        self.setLayout(self.verticalLayout_pulse_gragh)
+
+        self.pulse_plot = None
 
         # main graph init
         pg.setConfigOptions(leftButtonPan=True,
@@ -441,6 +463,7 @@ class MCA_MainUI(QMainWindow, Ui_MainWindow, QApplication):
 
         type = "MCA"
         pulse = None
+
         if filename.split(".")[-1] == "tps":
             type = "PUL"
             pulse = Pulses(filename)
@@ -573,9 +596,23 @@ class MCA_MainUI(QMainWindow, Ui_MainWindow, QApplication):
         if plot[self.file_unpack_dict["type"]] == "PUL":
             self.tabWidget_top.setTabVisible(1, True)
             self.stackedWidget_info.setCurrentIndex(2)
+            if plot[self.file_unpack_dict["pulse"]].data.ndim == 2:
+                self.tabWidget_top.setTabVisible(2, True)
+                self.stackedWidget_info.setCurrentIndex(3)
         else:
             if not self.toolButton_genPulse.isChecked():
                 self.tabWidget_top.setTabVisible(1, False)
+                self.tabWidget_top.setTabVisible(2, False)
+
+    def static_convert_pulses(self, pulses):
+        x = pulses.get_abs_time()
+        x0 = x - 0.000001
+        x1 = x + 0.000001
+        yex = np.zeros(len(x) * 2)
+        x = np.concatenate((x, x0, x1))
+        y = np.concatenate((pulses[:, 0], yex))
+
+        return x, y
 
     def static_infoTab_genPulse_update(self):
         original_filename = self.comboBox_originalFile.currentText()
@@ -602,6 +639,33 @@ class MCA_MainUI(QMainWindow, Ui_MainWindow, QApplication):
         self.linearReg_plot = self.linearReg_plot_window.plot(x, y, pen=pg.mkPen(color=(200, 50, 0), width=3))
         self.linearReg_plot_window.setXRange(0, original_plot.max())
         self.linearReg_plot_window.setYRange(0, current_plot.max())
+
+    def do_draw_pulse(self):
+        # draw pulse tab
+        pulse = self.static_get_current_curve()
+        if pulse is None:
+            return
+        pulse = pulse[self.file_unpack_dict["pulse"]]
+        if not isinstance(pulse, Pulses):
+            #print("pulse is ", pulse)
+            return
+
+        if pulse.data.ndim != 2:
+            #print("ndim is ", pulse.data.ndim)
+            return
+
+        abs_time = pulse.data[:, 1] / 10**6
+        avg_time = abs_time.mean()
+        total_time = abs_time.sum()
+
+        #print(avg_time)
+
+        self.pulse_plot_window.plotItem.getViewBox().setLimits(xMin=-2 * avg_time,
+                                                               xMax=total_time + 2 * avg_time,
+                                                               yMin=-9, yMax=1024+9)
+
+        self.pulse_plot = self.pulse_plot_window.plot(*self.static_convert_pulses(pulse),
+                                                      pen=pg.mkPen(color=(200, 50, 0, 50), width=0.5))
 
     def do_draw_section(self, section=None):
         if section is None:
@@ -631,6 +695,9 @@ class MCA_MainUI(QMainWindow, Ui_MainWindow, QApplication):
         self.flag_vline_visibility = True
 
     def do_generate_pulse(self, filename, csp_rate=None, total_time=None, timed=False, open_later=True):
+        if not self.flag_file_opened:
+            return
+
         self.flag_pulse_generating = True
 
         self.logger.INFO("[pulse] 正在生成和脉冲数据，请稍后")
@@ -643,14 +710,18 @@ class MCA_MainUI(QMainWindow, Ui_MainWindow, QApplication):
         else:
             pulse = mca.to_pulses(csp_rate * total_time)
 
+        pulse.total_time = total_time
+        if self.flag_energyX_available:
+            pulse.energyX_a = self.K_energy_a
+            pulse.energyX_b = self.K_energy_b
         pulse.to_file(filename)
-
-        self.logger.INFO("[pulse] 核脉冲数据已生成至文件\"{}\"".format(filename))
 
         if open_later:
             self.static_add_file(MCA(filename), filename)
 
         self.flag_pulse_generating = False
+
+        self.logger.INFO("[pulse] 核脉冲数据已生成至文件\"{}\"".format(filename))
 
     def on_energyX_delete_clicked(self):
         item = self.listWidget_energyX_calaSpots.currentItem()
@@ -947,12 +1018,10 @@ class MCA_MainUI(QMainWindow, Ui_MainWindow, QApplication):
                 if list_item.isSelected():
                     self.toolButton_file_hide.setChecked(True)
 
-
-
-
         self.static_infoTab_genPulse_update()
         self.static_flush_graph()
         self.static_update_overview()
+        self.do_draw_pulse()
 
     def on_mouse_clicked(self, evt):
         evt = evt[0]
@@ -1038,6 +1107,8 @@ class MCA_MainUI(QMainWindow, Ui_MainWindow, QApplication):
         os.system("start /b notepad.exe {}".format(filename))
 
     def on_export_pulse_buttom_clicked(self):
+        if not self.flag_file_opened:
+            return
         if self.flag_pulse_generating:
             pop_notice("提示", "核脉冲生成正在进行，请勿重复点击")
             return
@@ -1047,7 +1118,18 @@ class MCA_MainUI(QMainWindow, Ui_MainWindow, QApplication):
         timed = self.checkBox_pulse_addTimeAxis.isChecked()
         open_after = self.checkBox_pulse_openLater.isChecked()
 
-        threading.Thread(target=self.do_generate_pulse, args=())
+        filenames = QFileDialog.getSaveFileName(caption="保存",
+                                                filter="核脉冲文件 (*.tps);;"
+                                                       "所有文件类型 (*)",
+                                                parent=self)[0]
+
+        if filenames is None:
+            return
+
+        threading.Thread(target=self.do_generate_pulse, args=(filenames, csp_rate,
+                                                              measure_time, timed,
+                                                              open_after
+                                                              )).start()
 
 
 def pop_notice(type, title, msg):

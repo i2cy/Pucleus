@@ -317,7 +317,7 @@
              <enum>QTabWidget::North</enum>
             </property>
             <property name="currentIndex">
-             <number>2</number>
+             <number>0</number>
             </property>
             <property name="movable">
              <bool>true</bool>
@@ -786,117 +786,14 @@
                  <property name="geometry">
                   <rect>
                    <x>0</x>
-                   <y>-66</y>
+                   <y>-38</y>
                    <width>351</width>
-                   <height>396</height>
+                   <height>394</height>
                   </rect>
                  </property>
                  <layout class="QGridLayout" name="gridLayout_12">
                   <item row="4" column="1">
                    <widget class="QLabel" name="label_43">
-                    <property name="text">
-                     <string/>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="10" column="2" colspan="5">
-                   <widget class="QLabel" name="label_51">
-                    <property name="text">
-                     <string>脉冲时间间隔概率密度函数：</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="5" column="1">
-                   <widget class="QLabel" name="label_49">
-                    <property name="text">
-                     <string/>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="13" column="1">
-                   <widget class="QLabel" name="label_46">
-                    <property name="text">
-                     <string/>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="7" column="1">
-                   <widget class="QLabel" name="label_47">
-                    <property name="text">
-                     <string/>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="15" column="1">
-                   <widget class="QLabel" name="label_45">
-                    <property name="text">
-                     <string/>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="3" column="1">
-                   <widget class="QLabel" name="label_42">
-                    <property name="text">
-                     <string/>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="0" column="2" colspan="5">
-                   <widget class="QLabel" name="label_29">
-                    <property name="sizePolicy">
-                     <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
-                      <horstretch>0</horstretch>
-                      <verstretch>0</verstretch>
-                     </sizepolicy>
-                    </property>
-                    <property name="text">
-                     <string>脉冲浏览（模拟核脉冲）：</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="2" column="1">
-                   <widget class="QLabel" name="label_41">
-                    <property name="text">
-                     <string/>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="16" column="1">
-                   <widget class="QLabel" name="label_44">
-                    <property name="text">
-                     <string/>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="11" column="2" rowspan="8" colspan="5">
-                   <layout class="QVBoxLayout" name="verticalLayout_pulse_time_gragh"/>
-                  </item>
-                  <item row="8" column="1">
-                   <widget class="QLabel" name="label_40">
-                    <property name="text">
-                     <string/>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="11" column="1">
-                   <widget class="QLabel" name="label_52">
-                    <property name="text">
-                     <string/>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="6" column="1">
-                   <widget class="QLabel" name="label_50">
-                    <property name="text">
-                     <string/>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="1" column="2" rowspan="8" colspan="5">
-                   <layout class="QVBoxLayout" name="verticalLayout_pulse_gragh"/>
-                  </item>
-                  <item row="12" column="1">
-                   <widget class="QLabel" name="label_55">
                     <property name="text">
                      <string/>
                     </property>
@@ -909,6 +806,30 @@
                     </property>
                    </widget>
                   </item>
+                  <item row="1" column="2" rowspan="8" colspan="3">
+                   <layout class="QVBoxLayout" name="verticalLayout_pulse_gragh"/>
+                  </item>
+                  <item row="11" column="1">
+                   <widget class="QLabel" name="label_52">
+                    <property name="text">
+                     <string/>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="3" column="1">
+                   <widget class="QLabel" name="label_42">
+                    <property name="text">
+                     <string/>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="15" column="1">
+                   <widget class="QLabel" name="label_45">
+                    <property name="text">
+                     <string/>
+                    </property>
+                   </widget>
+                  </item>
                   <item row="17" column="1">
                    <widget class="QLabel" name="label_54">
                     <property name="text">
@@ -916,8 +837,8 @@
                     </property>
                    </widget>
                   </item>
-                  <item row="1" column="1">
-                   <widget class="QLabel" name="label_39">
+                  <item row="5" column="1">
+                   <widget class="QLabel" name="label_49">
                     <property name="text">
                      <string/>
                     </property>
@@ -930,49 +851,86 @@
                     </property>
                    </widget>
                   </item>
-                  <item row="9" column="2">
-                   <widget class="QToolButton" name="toolButton_pulseRescale">
+                  <item row="11" column="2" rowspan="8" colspan="3">
+                   <layout class="QVBoxLayout" name="verticalLayout_pulse_time_gragh"/>
+                  </item>
+                  <item row="13" column="1">
+                   <widget class="QLabel" name="label_46">
                     <property name="text">
                      <string/>
-                    </property>
-                    <property name="icon">
-                     <iconset resource="resources.qrc">
-                      <normaloff>:/图标/assets/bootstrap_reboot_640.svg</normaloff>:/图标/assets/bootstrap_reboot_640.svg</iconset>
-                    </property>
-                    <property name="autoRaise">
-                     <bool>true</bool>
                     </property>
                    </widget>
                   </item>
-                  <item row="9" column="3">
-                   <widget class="QToolButton" name="toolButton_pulse_zoomIn">
+                  <item row="2" column="1">
+                   <widget class="QLabel" name="label_41">
                     <property name="text">
                      <string/>
                     </property>
-                    <property name="icon">
-                     <iconset resource="resources.qrc">
-                      <normaloff>:/图标/assets/zoom_in_640.svg</normaloff>:/图标/assets/zoom_in_640.svg</iconset>
+                   </widget>
+                  </item>
+                  <item row="8" column="1">
+                   <widget class="QLabel" name="label_40">
+                    <property name="text">
+                     <string/>
                     </property>
-                    <property name="autoRaise">
-                     <bool>true</bool>
+                   </widget>
+                  </item>
+                  <item row="6" column="1">
+                   <widget class="QLabel" name="label_50">
+                    <property name="text">
+                     <string/>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="7" column="1">
+                   <widget class="QLabel" name="label_47">
+                    <property name="text">
+                     <string/>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="1">
+                   <widget class="QLabel" name="label_39">
+                    <property name="text">
+                     <string/>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="2" colspan="3">
+                   <widget class="QLabel" name="label_29">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="text">
+                     <string>脉冲浏览（模拟核脉冲）：</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="10" column="2" colspan="3">
+                   <widget class="QLabel" name="label_51">
+                    <property name="text">
+                     <string>脉冲时间间隔概率密度函数：</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="12" column="1">
+                   <widget class="QLabel" name="label_55">
+                    <property name="text">
+                     <string/>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="16" column="1">
+                   <widget class="QLabel" name="label_44">
+                    <property name="text">
+                     <string/>
                     </property>
                    </widget>
                   </item>
                   <item row="9" column="4">
-                   <widget class="QToolButton" name="toolButton_pulse_zommOut">
-                    <property name="text">
-                     <string/>
-                    </property>
-                    <property name="icon">
-                     <iconset resource="resources.qrc">
-                      <normaloff>:/图标/assets/zoom_out_640.svg</normaloff>:/图标/assets/zoom_out_640.svg</iconset>
-                    </property>
-                    <property name="autoRaise">
-                     <bool>true</bool>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="9" column="6">
                    <spacer name="horizontalSpacer_8">
                     <property name="orientation">
                      <enum>Qt::Horizontal</enum>
@@ -1646,7 +1604,7 @@ p, li { white-space: pre-wrap; }
            <number>0</number>
           </property>
           <property name="currentIndex">
-           <number>4</number>
+           <number>0</number>
           </property>
           <widget class="QWidget" name="page_void"/>
           <widget class="QWidget" name="page_section">
