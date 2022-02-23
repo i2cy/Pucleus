@@ -86,7 +86,7 @@ class MCA_MainUI(QMainWindow, Ui_MainWindow, QApplication):
         self.doubleSpinBox_measure_time.valueChanged.connect(self.on_overview_measure_time_changed)
         self.doubleSpinBox_measure_rate.valueChanged.connect(self.on_overview_measure_rate_changed)
 
-        self.comboBox_originalFile.currentTextChanged.connect(self.static_infoTab_genPulse_update)
+        self.comboBox_originalFile.currentTextChanged.connect(self.static_infoTab_rr_update)
 
         self.listWidget_file.itemSelectionChanged.connect(self.on_file_changed)
 
@@ -252,6 +252,7 @@ class MCA_MainUI(QMainWindow, Ui_MainWindow, QApplication):
         self.thread_pulse_info_updater.setParent(self)
 
         self.thread_pulse_info_updater.draw.connect(self.do_draw_pulse)
+        self.thread_pulse_generator.open_later.connect(self.static_add_file)
 
     def static_channel_2_energy(self, channel, a=None, b=None):
         if a is None:
@@ -490,11 +491,13 @@ class MCA_MainUI(QMainWindow, Ui_MainWindow, QApplication):
             if plot[self.file_unpack_dict["pulse"]].data.ndim == 2:
                 self.tabWidget_top.setTabVisible(2, True)
                 self.stackedWidget_info.setCurrentIndex(3)
+            else:
+                self.tabWidget_top.setTabVisible(2, False)
         else:
             self.tabWidget_top.setTabVisible(1, False)
             self.tabWidget_top.setTabVisible(2, False)
 
-    def static_infoTab_genPulse_update(self):
+    def static_infoTab_rr_update(self):
         original_filename = self.comboBox_originalFile.currentText()
         files = [ele[self.file_unpack_dict["filename"]] for ele in self.files]
         self.linearReg_plot_window.clear()
@@ -544,7 +547,7 @@ class MCA_MainUI(QMainWindow, Ui_MainWindow, QApplication):
                                                                    width=0.5,
                                                                    stepMode="left")
                                                       )
-        self.logger.INFO("[pulse] 脉冲预览图已绘制")
+        self.logger.INFO("[核脉冲模块] 脉冲预览图已绘制")
 
     def do_draw_section(self, section=None):
         if section is None:
@@ -580,31 +583,15 @@ class MCA_MainUI(QMainWindow, Ui_MainWindow, QApplication):
         if filename is None:
             return
 
-        self.flag_pulse_generating = True
-        # print(filename)
+        if self.flag_pulse_generating:
+            return
 
-        self.logger.INFO("[pulse] 正在生成和脉冲数据，请稍后")
-
-        mca = self.static_get_current_curve()
-        mca = mca[self.file_unpack_dict["current_mca"]]
-        assert isinstance(mca, MCA)
-        if timed:
-            pulse = mca.to_timed_pulses(csp_rate=csp_rate, total_time=total_time)
-        else:
-            pulse = mca.to_pulses(csp_rate * total_time)
-
-        pulse.total_time = total_time
-        if self.flag_energyX_available:
-            pulse.energyX_a = int(self.K_energy_a * 1000000)
-            pulse.energyX_b = int(self.K_energy_b * 1000000)
-        pulse.to_file(filename)
-
-        if open_later:
-            self.static_add_file(MCA(filename), filename)
-
-        self.flag_pulse_generating = False
-
-        self.logger.INFO("[pulse] 核脉冲数据已生成至文件\"{}\"".format(filename))
+        self.thread_pulse_generator.set_values(filename, csp_rate,
+                                               total_time, timed,
+                                               open_later,
+                                               self.static_get_current_curve()
+                                               )
+        self.thread_pulse_generator.start()
 
     def on_energyX_delete_clicked(self):
         item = self.listWidget_energyX_calaSpots.currentItem()
@@ -823,9 +810,7 @@ class MCA_MainUI(QMainWindow, Ui_MainWindow, QApplication):
             if not self.tabWidget_top.isTabVisible(1):
                 self.tabWidget_top.setTabVisible(1, True)
             self.tabWidget_top.setCurrentIndex(1)
-            self.stackedWidget_info.setCurrentIndex(2)
         else:
-            self.stackedWidget_tool.setCurrentIndex(0)
             self.static_infoTab_to_default()
 
     def on_tool_section_clicked(self):
@@ -839,6 +824,7 @@ class MCA_MainUI(QMainWindow, Ui_MainWindow, QApplication):
             if not self.toolButton_findPeek.isChecked():
                 self.stackedWidget_tool.setCurrentIndex(0)
             self.plot_window.plotItem.getViewBox().setAutoPan(False)
+            self.static_infoTab_to_default()
 
     def on_tool_smooth_clicked(self):
         if self.toolButton_smooth.isChecked():
@@ -849,6 +835,7 @@ class MCA_MainUI(QMainWindow, Ui_MainWindow, QApplication):
             self.do_hide_section()
         else:
             self.stackedWidget_tool.setCurrentIndex(0)
+            self.static_infoTab_to_default()
 
     def on_tool_findPeek_clicked(self):
         if self.toolButton_findPeek.isChecked():
@@ -901,7 +888,7 @@ class MCA_MainUI(QMainWindow, Ui_MainWindow, QApplication):
                 if list_item.isSelected():
                     self.toolButton_file_hide.setChecked(True)
 
-        self.static_infoTab_genPulse_update()
+        self.static_infoTab_rr_update()
         self.static_topBar_update()
         self.static_flush_graph()
         self.static_update_overview()
@@ -1001,6 +988,9 @@ class MCA_MainUI(QMainWindow, Ui_MainWindow, QApplication):
         measure_time = self.doubleSpinBox_pulse_measure_time.value()
         timed = self.checkBox_pulse_addTimeAxis.isChecked()
         open_after = self.checkBox_pulse_openLater.isChecked()
+        current_name = self.static_get_current_curve()[
+            self.file_unpack_dict["filename"]
+        ]
 
         filenames = QFileDialog.getSaveFileName(caption="保存",
                                                 filter="核脉冲文件 (*.tps);;"
@@ -1012,11 +1002,11 @@ class MCA_MainUI(QMainWindow, Ui_MainWindow, QApplication):
         if not filenames:
             return
 
-        self.thread_pulse_generator.set_values(filenames, csp_rate,
-                                               measure_time, timed,
-                                               open_after
-                                               )
-        self.thread_pulse_generator.start()
+        self.do_generate_pulse(filenames,
+                               csp_rate,
+                               measure_time,
+                               timed,
+                               open_after)
 
 
 def pop_notice(type, title, msg):

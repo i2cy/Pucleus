@@ -24,45 +24,38 @@ class TestThread(QThread):
 
 
 class PulseGenThread(QThread):
-    open_later = pyqtSignal()
+    open_later = pyqtSignal(MCA, str)
 
     def __init__(self, parent, filename=None, csp_rate=None,
                  measure_time=None, timed=None,
                  open_after=False):
         super(PulseGenThread, self).__init__()
         self.parent = parent
+        self.logger = self.parent.logger
         self.filename = filename
         self.csp_rate = csp_rate
         self.total_time = measure_time
         self.timed = timed
         self.open_after = open_after
+        self.curve = None
+        self.file_unpack_dict = self.parent.file_unpack_dict
 
     def set_values(self, filename, csp_rate,
                    measure_time, timed,
-                   open_after
+                   open_after, curve
                    ):
         self.filename = filename
         self.csp_rate = csp_rate
         self.total_time = measure_time
         self.timed = timed
         self.open_after = open_after
-        self.flag_pulse_generating = flag_pulse_generating
-        self.logger = logger
+        self.curve = curve
 
     def run(self):
-        if not self.parent.flag_file_opened:
-            return
+        self.logger.INFO("[核脉冲模块] 正在生成和脉冲数据，请稍后")
 
-        if self.filename is None:
-            return
-
-        self.parent.flag_pulse_generating = True
-        # print(filename)
-
-        self.parent.logger.INFO("[pulse] 正在生成和脉冲数据，请稍后")
-
-        mca = self.parent.static_get_current_curve()
-        mca = mca[self.parent.file_unpack_dict["current_mca"]]
+        mca = self.curve
+        mca = mca[self.file_unpack_dict["current_mca"]]
         assert isinstance(mca, MCA)
         if self.timed:
             pulse = mca.to_timed_pulses(csp_rate=self.csp_rate, total_time=self.total_time)
@@ -74,14 +67,13 @@ class PulseGenThread(QThread):
             pulse.energyX_a = int(self.parent.K_energy_a * 1000000)
             pulse.energyX_b = int(self.parent.K_energy_b * 1000000)
         pulse.to_file(self.filename)
-        print(pulse.total_time)
 
         if self.open_after:
-            self.parent.static_add_file(MCA(self.filename), self.filename)
+            self.open_later.emit(MCA(self.filename), self.filename)
 
         self.parent.flag_pulse_generating = False
 
-        self.parent.logger.INFO("[pulse] 核脉冲数据已生成至文件\"{}\"".format(self.filename))
+        self.logger.INFO("[核脉冲模块] 核脉冲数据已生成至文件\"{}\"".format(self.filename))
 
 
 class UpdatePulseInfoThread(QThread):
@@ -117,7 +109,7 @@ class UpdatePulseInfoThread(QThread):
             # print("ndim is ", pulse.data.ndim)
             return
 
-        self.logger.INFO("[pulse] 正在绘制核脉冲预览")
+        self.logger.INFO("[核脉冲模块] 正在绘制核脉冲预览")
 
         # print(avg_time)
         self.data = self.static_convert_pulses(pulse)
