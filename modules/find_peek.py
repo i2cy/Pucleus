@@ -73,14 +73,17 @@ class Peek(object):
 
 class SimpleCompare(PeekFinder):
 
-    def __init__(self, k, m):
+    def __init__(self, mca, scan_range, k, m):
         """
         简单比较法
 
+        :param mca: MCA, MCA 谱线对象
+        :param scan_range: (int index_satrt, int index_end)
         :param k: float, 找峰阈值，一般在1~1.5之间
         :param m: int, 寻峰宽度因子
         """
 
+        super(SimpleCompare, self).__init__()
         self.k = k
         self.m = m
 
@@ -102,10 +105,27 @@ class SimpleCompare(PeekFinder):
             return peek
 
         maxi = max(channel_data[peek-self.m, peek+self.m])
-        peek = channel_data
-
+        peek = channel_data.index(maxi, peek-self.m, peek+self.m)
 
         return peek
+
+    def __find_left(self, peek_index, channel_data):
+        left_edge = None
+        for i, cnt in enumerate(channel_data[peek_index:self.m:-1]):
+            cnt_v = cnt + (self.k * cnt**-0.5)
+            if cnt_v <= channel_data[peek_index - ((i + 1) * self.m)]:
+                left_edge = peek_index - i
+
+        return left_edge
+
+    def __find_right(self, peek_index, channel_data):
+        right_edge = None
+        for i, cnt in enumerate(channel_data[peek_index:-self.m]):
+            cnt_v = cnt + (self.k * cnt ** -0.5)
+            if cnt_v <= channel_data[peek_index + ((i + 1) * self.m)]:
+                right_edge = peek_index - i
+
+        return right_edge
 
     def search(self, range=None):
         super(SimpleCompare, self).search(range)
@@ -116,9 +136,10 @@ class SimpleCompare(PeekFinder):
 
         while index < len(channel_data) - 1:
             peek = self.__find_peek(index, channel_data)
+            right_edge = self.__find_right(peek, channel_data) + self.range[0]
+            left_edge = self.__find_left(peek, channel_data) + self.range[0]
+            peek += self.range[0]
 
+            edges = [left_edge, right_edge]
 
-
-
-
-
+            self.peeks.append(Peek(peek, edges, self.mca))
