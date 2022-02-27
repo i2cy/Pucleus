@@ -38,6 +38,39 @@
       </property>
       <item row="3" column="0" colspan="3">
        <layout class="QGridLayout" name="gridLayout_4">
+        <item row="0" column="8">
+         <spacer name="horizontalSpacer_4">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="0" column="2">
+         <widget class="QLabel" name="label_13">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>ch    </string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="5">
+         <widget class="QLabel" name="label_14">
+          <property name="text">
+           <string>KeV    </string>
+          </property>
+         </widget>
+        </item>
         <item row="0" column="3">
          <widget class="QLabel" name="label_4">
           <property name="sizePolicy">
@@ -58,52 +91,43 @@
           </property>
          </widget>
         </item>
-        <item row="0" column="2">
-         <widget class="QLabel" name="label_13">
+        <item row="0" column="4">
+         <widget class="QLCDNumber" name="lcdNumber_energy">
           <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
-          <property name="text">
-           <string>ch    </string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="8">
-         <spacer name="horizontalSpacer_4">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
+          <property name="minimumSize">
            <size>
-            <width>40</width>
-            <height>20</height>
+            <width>125</width>
+            <height>32</height>
            </size>
           </property>
-         </spacer>
-        </item>
-        <item row="0" column="0">
-         <widget class="QLabel" name="label">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Minimum" vsizetype="Maximum">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>200</height>
+           </size>
           </property>
-          <property name="font">
-           <font>
-            <pointsize>10</pointsize>
-            <weight>75</weight>
-            <bold>true</bold>
-           </font>
+          <property name="cursor">
+           <cursorShape>IBeamCursor</cursorShape>
           </property>
-          <property name="tabletTracking">
-           <bool>false</bool>
+          <property name="frameShape">
+           <enum>QFrame::NoFrame</enum>
           </property>
-          <property name="text">
-           <string>道址：</string>
+          <property name="frameShadow">
+           <enum>QFrame::Sunken</enum>
+          </property>
+          <property name="smallDecimalPoint">
+           <bool>true</bool>
+          </property>
+          <property name="digitCount">
+           <number>8</number>
+          </property>
+          <property name="segmentStyle">
+           <enum>QLCDNumber::Flat</enum>
           </property>
          </widget>
         </item>
@@ -201,43 +225,26 @@
           </property>
          </widget>
         </item>
-        <item row="0" column="4">
-         <widget class="QLCDNumber" name="lcdNumber_energy">
+        <item row="0" column="0">
+         <widget class="QLabel" name="label">
           <property name="sizePolicy">
-           <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+           <sizepolicy hsizetype="Minimum" vsizetype="Maximum">
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
-          <property name="minimumSize">
-           <size>
-            <width>125</width>
-            <height>32</height>
-           </size>
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
           </property>
-          <property name="maximumSize">
-           <size>
-            <width>16777215</width>
-            <height>200</height>
-           </size>
+          <property name="tabletTracking">
+           <bool>false</bool>
           </property>
-          <property name="cursor">
-           <cursorShape>IBeamCursor</cursorShape>
-          </property>
-          <property name="frameShape">
-           <enum>QFrame::NoFrame</enum>
-          </property>
-          <property name="frameShadow">
-           <enum>QFrame::Sunken</enum>
-          </property>
-          <property name="smallDecimalPoint">
-           <bool>true</bool>
-          </property>
-          <property name="digitCount">
-           <number>8</number>
-          </property>
-          <property name="segmentStyle">
-           <enum>QLCDNumber::Flat</enum>
+          <property name="text">
+           <string>道址：</string>
           </property>
          </widget>
         </item>
@@ -258,13 +265,6 @@
           </property>
           <property name="text">
            <string>计数：</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="5">
-         <widget class="QLabel" name="label_14">
-          <property name="text">
-           <string>KeV    </string>
           </property>
          </widget>
         </item>
@@ -349,8 +349,8 @@
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>351</width>
-                   <height>365</height>
+                   <width>368</width>
+                   <height>370</height>
                   </rect>
                  </property>
                  <layout class="QGridLayout" name="gridLayout_15" rowstretch="0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0">
@@ -710,7 +710,7 @@
                        <x>0</x>
                        <y>0</y>
                        <width>368</width>
-                       <height>330</height>
+                       <height>370</height>
                       </rect>
                      </property>
                      <layout class="QGridLayout" name="gridLayout_9">
@@ -786,7 +786,7 @@
                  <property name="geometry">
                   <rect>
                    <x>0</x>
-                   <y>-38</y>
+                   <y>-24</y>
                    <width>351</width>
                    <height>394</height>
                   </rect>
@@ -806,39 +806,32 @@
                     </property>
                    </widget>
                   </item>
-                  <item row="1" column="2" rowspan="8" colspan="3">
-                   <layout class="QVBoxLayout" name="verticalLayout_pulse_gragh"/>
-                  </item>
-                  <item row="11" column="1">
-                   <widget class="QLabel" name="label_52">
+                  <item row="6" column="1">
+                   <widget class="QLabel" name="label_50">
                     <property name="text">
                      <string/>
                     </property>
                    </widget>
                   </item>
-                  <item row="3" column="1">
-                   <widget class="QLabel" name="label_42">
+                  <item row="11" column="2" rowspan="8" colspan="3">
+                   <layout class="QVBoxLayout" name="verticalLayout_pulse_time_gragh"/>
+                  </item>
+                  <item row="7" column="1">
+                   <widget class="QLabel" name="label_47">
                     <property name="text">
                      <string/>
                     </property>
                    </widget>
                   </item>
-                  <item row="15" column="1">
-                   <widget class="QLabel" name="label_45">
+                  <item row="13" column="1">
+                   <widget class="QLabel" name="label_46">
                     <property name="text">
                      <string/>
                     </property>
                    </widget>
                   </item>
-                  <item row="17" column="1">
-                   <widget class="QLabel" name="label_54">
-                    <property name="text">
-                     <string/>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="5" column="1">
-                   <widget class="QLabel" name="label_49">
+                  <item row="1" column="1">
+                   <widget class="QLabel" name="label_39">
                     <property name="text">
                      <string/>
                     </property>
@@ -851,11 +844,43 @@
                     </property>
                    </widget>
                   </item>
-                  <item row="11" column="2" rowspan="8" colspan="3">
-                   <layout class="QVBoxLayout" name="verticalLayout_pulse_time_gragh"/>
+                  <item row="8" column="1">
+                   <widget class="QLabel" name="label_40">
+                    <property name="text">
+                     <string/>
+                    </property>
+                   </widget>
                   </item>
-                  <item row="13" column="1">
-                   <widget class="QLabel" name="label_46">
+                  <item row="5" column="1">
+                   <widget class="QLabel" name="label_49">
+                    <property name="text">
+                     <string/>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="17" column="1">
+                   <widget class="QLabel" name="label_54">
+                    <property name="text">
+                     <string/>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="3" column="1">
+                   <widget class="QLabel" name="label_42">
+                    <property name="text">
+                     <string/>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="11" column="1">
+                   <widget class="QLabel" name="label_52">
+                    <property name="text">
+                     <string/>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="15" column="1">
+                   <widget class="QLabel" name="label_45">
                     <property name="text">
                      <string/>
                     </property>
@@ -868,33 +893,18 @@
                     </property>
                    </widget>
                   </item>
-                  <item row="8" column="1">
-                   <widget class="QLabel" name="label_40">
-                    <property name="text">
-                     <string/>
+                  <item row="9" column="4">
+                   <spacer name="horizontalSpacer_8">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
                     </property>
-                   </widget>
-                  </item>
-                  <item row="6" column="1">
-                   <widget class="QLabel" name="label_50">
-                    <property name="text">
-                     <string/>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>40</width>
+                      <height>20</height>
+                     </size>
                     </property>
-                   </widget>
-                  </item>
-                  <item row="7" column="1">
-                   <widget class="QLabel" name="label_47">
-                    <property name="text">
-                     <string/>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="1" column="1">
-                   <widget class="QLabel" name="label_39">
-                    <property name="text">
-                     <string/>
-                    </property>
-                   </widget>
+                   </spacer>
                   </item>
                   <item row="0" column="2" colspan="3">
                    <widget class="QLabel" name="label_29">
@@ -930,18 +940,8 @@
                     </property>
                    </widget>
                   </item>
-                  <item row="9" column="4">
-                   <spacer name="horizontalSpacer_8">
-                    <property name="orientation">
-                     <enum>Qt::Horizontal</enum>
-                    </property>
-                    <property name="sizeHint" stdset="0">
-                     <size>
-                      <width>40</width>
-                      <height>20</height>
-                     </size>
-                    </property>
-                   </spacer>
+                  <item row="1" column="2" rowspan="8" colspan="3">
+                   <layout class="QVBoxLayout" name="verticalLayout_pulse_gragh"/>
                   </item>
                  </layout>
                 </widget>
@@ -954,7 +954,7 @@
           <item>
            <widget class="QTabWidget" name="tabWidget_bottom">
             <property name="sizePolicy">
-             <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
+             <sizepolicy hsizetype="Minimum" vsizetype="Maximum">
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
@@ -966,7 +966,7 @@
              <enum>QTabWidget::Rounded</enum>
             </property>
             <property name="currentIndex">
-             <number>1</number>
+             <number>0</number>
             </property>
             <property name="elideMode">
              <enum>Qt::ElideNone</enum>
@@ -993,7 +993,7 @@
                    <x>0</x>
                    <y>0</y>
                    <width>368</width>
-                   <height>329</height>
+                   <height>289</height>
                   </rect>
                  </property>
                  <layout class="QGridLayout" name="gridLayout_10">
@@ -1133,7 +1133,7 @@
                    <x>0</x>
                    <y>0</y>
                    <width>368</width>
-                   <height>329</height>
+                   <height>289</height>
                   </rect>
                  </property>
                  <layout class="QGridLayout" name="gridLayout_8">

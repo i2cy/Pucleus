@@ -138,7 +138,7 @@ class MCA_MainUI(QMainWindow, Ui_MainWindow, QApplication):
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.centralwidget.sizePolicy().hasHeightForWidth())
         self.pulse_plot_window.setSizePolicy(sizePolicy)
-        self.pulse_plot_window.plotItem.setLabels(left="幅度(电压)", bottom="时间")
+        self.pulse_plot_window.plotItem.setLabels(left="幅度", bottom="时间(s)")
         self.pulse_plot_window.plotItem.showGrid(x=False, y=True, alpha=0.5)
         self.pulse_plot_window.plotItem.showAxes("top")
         self.pulse_plot_window.plotItem.showAxes("right")
@@ -149,6 +149,25 @@ class MCA_MainUI(QMainWindow, Ui_MainWindow, QApplication):
         self.setLayout(self.verticalLayout_pulse_gragh)
 
         self.pulse_plot = None
+
+        # pulse time graph init
+        self.pulse_plot_time_window = Mod_PlotWidget(self)
+        sizePolicy = QSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.MinimumExpanding)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.centralwidget.sizePolicy().hasHeightForWidth())
+        self.pulse_plot_time_window.setSizePolicy(sizePolicy)
+        self.pulse_plot_time_window.plotItem.setLabels(left="概率", bottom="脉冲间隔时间(ms)")
+        self.pulse_plot_time_window.plotItem.showGrid(x=True, y=True, alpha=0.5)
+        self.pulse_plot_time_window.plotItem.showAxes("top")
+        self.pulse_plot_time_window.plotItem.showAxes("right")
+        self.pulse_plot_time_window.setBackground(None)
+        self.pulse_plot_time_window.setMouseEnabled(False, False)
+        self.linearReg_plot = None
+        self.linearReg_dots_plot = None
+
+        self.verticalLayout_pulse_time_gragh.addWidget(self.pulse_plot_time_window)
+        self.setLayout(self.verticalLayout_pulse_time_gragh)
 
         # main graph init
         pg.setConfigOptions(leftButtonPan=True,
@@ -251,7 +270,8 @@ class MCA_MainUI(QMainWindow, Ui_MainWindow, QApplication):
         self.thread_pulse_generator.setParent(self)
         self.thread_pulse_info_updater.setParent(self)
 
-        self.thread_pulse_info_updater.draw.connect(self.do_draw_pulse)
+        self.thread_pulse_info_updater.draw_pulse.connect(self.do_draw_pulse)
+        self.thread_pulse_info_updater.draw_pulse_time.connect(self.do_draw_pulse_time)
         self.thread_pulse_generator.open_later.connect(self.static_add_file)
 
     def static_channel_2_energy(self, channel, a=None, b=None):
@@ -536,18 +556,43 @@ class MCA_MainUI(QMainWindow, Ui_MainWindow, QApplication):
         self.thread_pulse_info_updater.set_curve(self.static_get_current_curve())
         self.thread_pulse_info_updater.start()
 
+    def static_update_windowTitle(self):
+        current_curve = self.static_get_current_curve()
+        if current_curve is None:
+            self.setWindowTitle("核脉冲数据生成分析")
+        else:
+            self.setWindowTitle("核脉冲数据生成分析 - {}".format(
+                current_curve[self.file_unpack_dict["filename"]]
+            ))
+
     def do_draw_pulse(self, data):
         total_time = data[0][-1]
+
+        self.pulse_plot_window.clear()
         self.pulse_plot_window.plotItem.getViewBox().setLimits(xMin=-2,
                                                                xMax=total_time + 2,
                                                                yMin=-9, yMax=1024 + 9)
 
         self.pulse_plot = self.pulse_plot_window.plot(*data,
                                                       pen=pg.mkPen(color=(255, 200, 0, 80),
-                                                                   width=0.5,
+                                                                   width=0.2,
                                                                    stepMode="left")
                                                       )
         self.logger.INFO("[核脉冲模块] 脉冲预览图已绘制")
+
+    def do_draw_pulse_time(self, data):
+        max_time = data[0][-1]
+
+        self.pulse_plot_time_window.clear()
+        self.pulse_plot_time_window.plotItem.getViewBox().setLimits(xMin=-2,
+                                                                    xMax=max_time + 2,
+                                                                    yMin=-0.1, yMax=1.1)
+        self.pulse_plot = self.pulse_plot_time_window.plot(*data,
+                                                           pen=pg.mkPen(color=(200, 50, 0),
+                                                                        width=3,
+                                                                        stepMode="left")
+                                                           )
+        self.logger.INFO("[核脉冲模块] 脉冲时间间隔概率密度图已绘制")
 
     def do_draw_section(self, section=None):
         if section is None:
@@ -811,6 +856,7 @@ class MCA_MainUI(QMainWindow, Ui_MainWindow, QApplication):
                 self.tabWidget_top.setTabVisible(1, True)
             self.tabWidget_top.setCurrentIndex(1)
         else:
+            self.tabWidget_top.setCurrentIndex(0)
             self.static_infoTab_to_default()
 
     def on_tool_section_clicked(self):
@@ -893,6 +939,7 @@ class MCA_MainUI(QMainWindow, Ui_MainWindow, QApplication):
         self.static_flush_graph()
         self.static_update_overview()
         self.static_update_pulseInfo()
+        self.static_update_windowTitle()
 
     def on_mouse_clicked(self, evt):
         evt = evt[0]

@@ -4,7 +4,7 @@
 # Project: main.py
 # Filename: q_threads
 # Created on: 2022/2/22
-
+import numpy as np
 from PyQt5.QtCore import QThread
 from PyQt5.Qt import pyqtSignal
 from .mca import MCA, Pulses
@@ -54,6 +54,8 @@ class PulseGenThread(QThread):
     def run(self):
         self.logger.INFO("[核脉冲模块] 正在生成和脉冲数据，请稍后")
 
+        self.parent.flag_pulse_generating = True
+
         mca = self.curve
         mca = mca[self.file_unpack_dict["current_mca"]]
         assert isinstance(mca, MCA)
@@ -77,13 +79,15 @@ class PulseGenThread(QThread):
 
 
 class UpdatePulseInfoThread(QThread):
-    draw = pyqtSignal(tuple)
+    draw_pulse = pyqtSignal(tuple)
+    draw_pulse_time = pyqtSignal(tuple)
 
     def __init__(self, parent):
         super(UpdatePulseInfoThread, self).__init__()
         self.parent = parent
         self.file_unpack_dict = self.parent.file_unpack_dict
-        self.data = None
+        self.pulse_data = None
+        self.pulse_time = None
         self.logger = self.parent.logger
         self.curve = None
 
@@ -92,6 +96,29 @@ class UpdatePulseInfoThread(QThread):
         y = pulses[:, 0]
 
         return x, y
+
+    def static_convert_time_to_posibility(self, pulses, divs=1000):
+        """
+
+        :param pulses:
+        :param divs:
+        :return: x(毫秒), y概率
+        """
+        assert isinstance(pulses, Pulses)
+        times = pulses.data[:, 1]
+        assert isinstance(times, np.ndarray)
+        time_p = np.zeros(divs, dtype=np.float64)
+        t_max = times.max()
+        dt = t_max / divs
+        x = np.linspace(0, t_max / 1000, divs)
+
+        for i in range(divs):
+            condition_1 = dt * i < times
+            condition_2 = times <= dt * (i + 1)
+            time_p[i] += (condition_1 * condition_2).sum()
+
+        time_p /= time_p.sum()
+        return x, time_p
 
     def set_curve(self, curve):
         self.curve = curve
@@ -112,6 +139,8 @@ class UpdatePulseInfoThread(QThread):
         self.logger.INFO("[核脉冲模块] 正在绘制核脉冲预览")
 
         # print(avg_time)
-        self.data = self.static_convert_pulses(pulse)
+        self.pulse_data = self.static_convert_pulses(pulse)
+        self.pulse_time = self.static_convert_time_to_posibility(pulse)
 
-        self.draw.emit(self.data)
+        self.draw_pulse.emit(self.pulse_data)
+        self.draw_pulse_time.emit(self.pulse_time)
