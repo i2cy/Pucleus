@@ -17,6 +17,7 @@ class PeekFinder(object):
 
         :param mca: MCA object
         """
+        assert isinstance(mca, MCA)
         self.mca = mca
         self.peeks = []
         self.range = range
@@ -51,6 +52,10 @@ class PeekFinder(object):
         self.__index = 0
         self.peeks = []
 
+    def search(self, range=None):
+        if range is not None:
+            self.range = range
+
 
 class Peek(object):
 
@@ -64,3 +69,56 @@ class Peek(object):
         self.mean = position
         self.left_edge = self.edges[0]
         self.right_edge = self.edges[1]
+
+
+class SimpleCompare(PeekFinder):
+
+    def __init__(self, k, m):
+        """
+        简单比较法
+
+        :param k: float, 找峰阈值，一般在1~1.5之间
+        :param m: int, 寻峰宽度因子
+        """
+
+        self.k = k
+        self.m = m
+
+        self.left_edge = -1
+        self.right_edge = -1
+
+    def __find_peek(self, index, channel_data):
+        peek = None
+        if index >= len(channel_data - self.m):
+            return peek
+
+        for i, cnt in enumerate(channel_data[index+self.m:-self.m]):
+            peek_value = cnt - (self.k * cnt**-0.5)
+            if channel_data[index + i + self.m] < peek_value \
+                    > channel_data[index + i - self.m]:
+                peek = index + i
+
+        if peek is None:
+            return peek
+
+        maxi = max(channel_data[peek-self.m, peek+self.m])
+        peek = channel_data
+
+
+        return peek
+
+    def search(self, range=None):
+        super(SimpleCompare, self).search(range)
+
+        index = 0
+
+        channel_data = self.mca[self.range[0], self.range[1]]
+
+        while index < len(channel_data) - 1:
+            peek = self.__find_peek(index, channel_data)
+
+
+
+
+
+
