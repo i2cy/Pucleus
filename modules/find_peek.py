@@ -7,6 +7,7 @@
 
 from .mca import MCA, Pulses
 import numpy as np
+import matplotlib.pyplot as plt
 
 
 class PeekFinder(object):
@@ -21,6 +22,7 @@ class PeekFinder(object):
         self.mca = mca
         self.peeks = []
         self.range = range
+        self.flag_searched = False
 
         self.__index = 0
 
@@ -34,6 +36,8 @@ class PeekFinder(object):
         :param item:
         :return:
         """
+        if not self.flag_searched:
+            self.search()
         return self.peeks[item]
 
     def __iter__(self):
@@ -51,16 +55,19 @@ class PeekFinder(object):
     def reset(self):
         self.__index = 0
         self.peeks = []
+        self.flag_searched = False
 
     def search(self, range=None):
         if range is not None:
             self.range = range
 
+    def is_searched(self):
+        return self.flag_searched
+
 
 class Peek(object):
 
     def __init__(self, position, edges, mca_data):
-
         self.__mca_data = mca_data
 
         self.position = position
@@ -69,6 +76,19 @@ class Peek(object):
         self.mean = position
         self.left_edge = self.edges[0]
         self.right_edge = self.edges[1]
+
+    def plotshow(self):
+        ind = np.zeros(len(self.__mca_data))
+        ind[self.left_edge] = self.__mca_data[self.left_edge] + 100
+        ind[self.right_edge] = self.__mca_data[self.right_edge] + 100
+        top = np.zeros(len(self.__mca_data))
+        top[self.position] = self.__mca_data[self.position] + 100
+
+        plt.plot(self.__mca_data)
+        plt.plot(ind, color="orange")
+        plt.plot(top, color="red")
+
+        plt.show()
 
 
 class SimpleCompare(PeekFinder):
@@ -83,47 +103,64 @@ class SimpleCompare(PeekFinder):
         :param m: int, 寻峰宽度因子
         """
 
-        super(SimpleCompare, self).__init__()
+        super(SimpleCompare, self).__init__(mca, scan_range)
         self.k = k
         self.m = m
-
-        self.left_edge = -1
-        self.right_edge = -1
 
     def __find_peek(self, index, channel_data):
         peek = None
         if index >= len(channel_data - self.m):
             return peek
 
-        for i, cnt in enumerate(channel_data[index+self.m:-self.m]):
-            peek_value = cnt - (self.k * cnt**-0.5)
-            if channel_data[index + i + self.m] < peek_value \
-                    > channel_data[index + i - self.m]:
-                peek = index + i
+        for i, cnt in enumerate(channel_data[index + self.m:-self.m]):
+            if not cnt:
+                continue
+            peek_value = cnt - (self.k * cnt ** -0.5)
+
+            # print("[DEBUG] index: {}  peek: {}  peek_value: {}  last: {}  next: {}".format(
+            #     i, cnt, peek_value, channel_data[index + i],
+            #     channel_data[index + i + 2*self.m]))
+            # print("[DEBUG] last_index: {}  current_index: {}  next_index: {}".format(
+            #     index + i, index + i + self.m, index + i + 2*self.m))
+
+            if channel_data[index + i + 2 * self.m] < peek_value and \
+                    peek_value > channel_data[index + i]:
+                peek = index + i + self.m
+                break
 
         if peek is None:
             return peek
 
-        maxi = max(channel_data[peek-self.m, peek+self.m])
-        peek = channel_data.index(maxi, peek-self.m, peek+self.m)
+        maxi = max(channel_data[peek - self.m:peek + self.m])
+        assert isinstance(channel_data, np.ndarray)
+        peek = channel_data.tolist().index(maxi, peek - self.m, peek + self.m)
 
         return peek
 
     def __find_left(self, peek_index, channel_data):
-        left_edge = None
-        for i, cnt in enumerate(channel_data[peek_index:self.m:-1]):
-            cnt_v = cnt + (self.k * cnt**-0.5)
-            if cnt_v <= channel_data[peek_index - ((i + 1) * self.m)]:
+        left_edge = channel_data[0]
+        for i, cnt in enumerate(channel_data[peek_index:self.m - 1:-1]):
+            if not cnt:
                 left_edge = peek_index - i
+                break
+            cnt_v = cnt + (self.k * cnt ** -0.5)
+            # print(cnt, cnt_v, channel_data[peek_index - i - self.m])
+            if cnt_v <= channel_data[peek_index - i - self.m]:
+                left_edge = peek_index - i
+                break
 
         return left_edge
 
     def __find_right(self, peek_index, channel_data):
-        right_edge = None
+        right_edge = channel_data[-1]
         for i, cnt in enumerate(channel_data[peek_index:-self.m]):
-            cnt_v = cnt + (self.k * cnt ** -0.5)
-            if cnt_v <= channel_data[peek_index + ((i + 1) * self.m)]:
+            if not cnt:
                 right_edge = peek_index - i
+                break
+            cnt_v = cnt + (self.k * cnt ** -0.5)
+            if cnt_v <= channel_data[peek_index + i + self.m]:
+                right_edge = peek_index + i
+                break
 
         return right_edge
 
@@ -132,14 +169,18 @@ class SimpleCompare(PeekFinder):
 
         index = 0
 
-        channel_data = self.mca[self.range[0], self.range[1]]
+        channel_data = self.mca[self.range[0]:self.range[1]]
 
         while index < len(channel_data) - 1:
             peek = self.__find_peek(index, channel_data)
+            if peek is None:
+                break
             right_edge = self.__find_right(peek, channel_data) + self.range[0]
             left_edge = self.__find_left(peek, channel_data) + self.range[0]
-            peek += self.range[0]
+            index = peek
 
             edges = [left_edge, right_edge]
 
-            self.peeks.append(Peek(peek, edges, self.mca))
+            self.peeks.append(Peek(peek + self.range[0], edges, self.mca))
+
+        self.flag_searched = True
