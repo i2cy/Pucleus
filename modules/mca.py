@@ -8,18 +8,49 @@
 import numpy as np
 import time
 import hashlib
+import struct
+
+
+DICT_DATE = {1: "Jan",
+             2: "Feb",
+             3: "Mar",
+             4: "Apr",
+             5: "May",
+             6: "Jun",
+             7: "Jul",
+             8: "Aug",
+             9: "Sep",
+             10: "Oct",
+             11: "Nov",
+             12: "Dec"}
 
 
 class MCA(object):
 
     def __init__(self, data=None):
 
-        data_raw_int = []
-        data_t = []
+        # chn args
+        self.version = -1
+        self.mca_detector_id = -1
+        self.segment_number = -1
+        self.start_time_ss = time.strftime("%S").encode()
+        self.real_time = 0
+        self.live_time = 0
+        self.start_date = time.strftime("%d").encode()
+        self.start_date += DICT_DATE[int(time.strftime("%m"))].encode()
+        self.start_date += time.strftime("%y1").encode()
+
+        self.start_time_hhmm = time.strftime("%H%M").encode()
+        self.ch_offset = 0
         self.channels = 1024
+
         self.total_time = 0
+
+        # En cal factors A + B*x + C*x*x'
+
         self.energyX_a = 0
         self.energyX_b = 0
+        self.energyX_c = 0
         self.timestamp = 0
 
         if isinstance(data, str):
@@ -36,8 +67,18 @@ class MCA(object):
             self.total_time = data.total_time
             self.energyX_a = data.energyX_a
             self.energyX_b = data.energyX_b
+            self.energyX_c = data.energyX_c
             self.timestamp = data.timestamp
             self.data = data.data.copy()
+            self.version = data.version
+            self.mca_detector_id = data.mca_detector_id
+            self.segment_number = data.segment_number
+            self.start_time_ss = data.start_time_ss
+            self.real_time = data.real_time
+            self.live_time = data.live_time
+            self.start_date = data.start_date
+            self.start_time_hhmm = data.start_time_hhmm
+            self.ch_offset = data.ch_offset
 
         else:
             data_t = np.zeros(1024, dtype=np.float64)
@@ -181,6 +222,8 @@ class MCA(object):
             data = f.readlines()
 
             for i, ele in enumerate(data):
+                if ele and ele[0] == "#":
+                    continue
                 while len(ele) > 1 and ele[-1] in ("\r", "\n"):
                     ele = ele[:-1]
                 if ele:
@@ -196,15 +239,31 @@ class MCA(object):
 
         elif filename[-3:] == "chn":
             f = open(filename, 'rb')
-            data_raw = f.read()
-            args = data_raw[:32]
-            data_raw = data_raw[32:]
-            data_t = []
-            for i, e in enumerate(data_raw[::4]):
-                data_t.append(int.from_bytes(data_raw[4 * i:4 * (i + 1)], "little", signed=False))
+            self.version = struct.unpack('h', f.read(2))[0]
+            self.mca_detector_id = struct.unpack('h', f.read(2))[0]
+            self.segment_number = struct.unpack('h', f.read(2))[0]
+            self.start_time_ss = f.read(2)
+            self.real_time = struct.unpack('I', f.read(4))[0]
+            self.live_time = struct.unpack('I', f.read(4))[0]
+            self.start_date = f.read(8)  # Ascii type date in
+            # DDMMMYY* where * == 1 means 21th century
+            self.start_time_hhmm = f.read(4)
+            self.ch_offset = struct.unpack('h', f.read(2))[0]
+            self.channels = struct.unpack('h', f.read(2))[0]
+            self.data = np.zeros(self.channels, dtype=np.float64)
+            self.total_time = self.live_time / 50
+            for i in range(self.channels):
+                self.data[i] = struct.unpack('I', f.read(4))[0]
+            f_next = f.read(2)
+            if not f_next:
+                return
+            assert struct.unpack('h', f_next)[0] == -102
+            f.read(2)
+            self.energyX_b = struct.unpack('f', f.read(4))[0]
+            self.energyX_a = struct.unpack('f', f.read(4))[0]
+            self.energyX_c = struct.unpack('f', f.read(4))[0]
 
-            self.data = np.array(data_t, dtype=np.float64)
-            self.channels = len(self.data)
+            f.close()
 
         elif filename[-3:] == "tps":
             pulse = Pulses(filename)
@@ -242,6 +301,12 @@ class MCA(object):
             if sha != hasher.digest():
                 raise Exception("文件损坏")
 
+            self.start_time_hhmm = time.strftime("%H%M", time.localtime(self.timestamp / 1000)).encode()
+            self.start_time_ss = time.strftime("%S", time.localtime(self.timestamp / 1000)).encode()
+            self.start_date = time.strftime("%d", time.localtime(self.timestamp / 1000)).encode()
+            self.start_date += DICT_DATE[int(time.strftime("%m", time.localtime(self.timestamp / 1000)))].encode()
+            self.start_date += time.strftime("%y1", time.localtime(self.timestamp / 1000)).encode()
+
             data = data[54:]  # 4N*B 脉冲数据
             self.data = np.frombuffer(data, dtype=np.uint32)
 
@@ -268,7 +333,9 @@ class MCA(object):
 
         data = b""
 
-        if filename[-3:] == "tch":  # 自定义TCH能谱文件格式
+        file_end = filename.split(".")[-1]
+
+        if file_end == "tch":  # 自定义TCH能谱文件格式
             head = "CHN"
             head = head.encode()
             data += head
@@ -279,7 +346,7 @@ class MCA(object):
             channels = self.channels.to_bytes(2, "little", signed=False)
             data += channels
 
-            total_time = self.total_time
+            total_time = int(self.total_time)
             total_time = total_time.to_bytes(3, "little", signed=False)
             data += total_time
 
@@ -298,6 +365,31 @@ class MCA(object):
             data += sha
 
             data += data_raw
+
+        elif file_end in ("txt", "mca"):
+            for i in self.data:
+                data += str(i).encode()
+                data += b"\r\n"
+
+        elif file_end == "chn":
+            data += self.version.to_bytes(2, "little", signed=True)
+            data += self.mca_detector_id.to_bytes(2, "little", signed=True)
+            data += self.segment_number.to_bytes(2, "little", signed=True)
+            data += self.start_time_ss
+            data += self.real_time.to_bytes(4, "little", signed=False)
+            data += self.live_time.to_bytes(4, "little", signed=False)
+            data += self.start_date
+            data += self.start_time_hhmm
+            data += self.ch_offset.to_bytes(2, "little", signed=True)
+            data += self.channels.to_bytes(2, "little", signed=True)
+            for e in self.data:
+                data += int(e).to_bytes(4, "little", signed=False)
+            if self.energyX_a:
+                data += int(-102).to_bytes(2, "little", signed=True)
+                data += b"\x00\x00"
+                data += struct.pack("f", self.energyX_b)
+                data += struct.pack("f", self.energyX_a)
+                data += struct.pack("f", self.energyX_c)
 
         with open(filename, "wb") as f:
             ret = f.write(data)
@@ -375,9 +467,16 @@ class MCA(object):
         elif isinstance(pulses, Pulses):
             self.channels = pulses.channels
             self.total_time = pulses.total_time
+            self.live_time = self.total_time * 50
+            self.real_time = self.total_time * 50
             self.energyX_a = pulses.energyX_a
             self.energyX_b = pulses.energyX_b
             self.timestamp = pulses.timestamp
+            self.start_time_hhmm = time.strftime("%H%M", time.localtime(self.timestamp / 1000)).encode()
+            self.start_time_ss = time.strftime("%S", time.localtime(self.timestamp / 1000)).encode()
+            self.start_date = time.strftime("%d", time.localtime(self.timestamp / 1000)).encode()
+            self.start_date += DICT_DATE[int(time.strftime("%m", time.localtime(self.timestamp / 1000)))].encode()
+            self.start_date += time.strftime("%y1", time.localtime(self.timestamp / 1000)).encode()
             res = np.zeros(self.channels, dtype=np.int32)
 
             if pulses.data.ndim == 1:
@@ -393,6 +492,9 @@ class MCA(object):
             filename = pulses
             pulses = Pulses(filename)
             self.from_pulses(pulses)
+
+        self.mca_detector_id = 256
+        self.segment_number = 2
 
         return self
 

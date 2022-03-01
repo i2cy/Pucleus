@@ -184,3 +184,19 @@ class SimpleCompare(PeekFinder):
             self.peeks.append(Peek(peek + self.range[0], edges, self.mca))
 
         self.flag_searched = True
+
+
+class GaussMultiplication(PeekFinder):
+
+    def __init__(self, mca, scan_range, k, m):
+        """
+        简单比较法
+
+        :param mca: MCA, MCA 谱线对象
+        :param scan_range: (int index_satrt, int index_end)
+        :param k: float, 找峰阈值，一般在1~1.5之间
+        :param m: int, 寻峰宽度因子
+        """
+        super(GaussMultiplication, self).__init__(mca, scan_range)
+
+

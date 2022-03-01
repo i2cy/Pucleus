@@ -4,11 +4,11 @@
 # Project: main.py
 # Filename: q_threads
 # Created on: 2022/2/22
+
 import numpy as np
 from PyQt5.QtCore import QThread
 from PyQt5.Qt import pyqtSignal
 from .mca import MCA, Pulses
-import pyqtgraph as pg
 import time
 
 

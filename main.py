@@ -55,8 +55,10 @@ class MCA_MainUI(QMainWindow, Ui_MainWindow, QApplication):
         self.action_resetFrame.triggered.connect(self.static_reset_plot_view)
         self.action_zoomIn.triggered.connect(self.on_zoom_in)
         self.action_zoomOut.triggered.connect(self.on_zoom_out)
+        self.action_export_chn.triggered.connect(self.on_save_file)
 
         self.toolButton_openFile.clicked.connect(self.on_open_file)
+        self.toolButton_save.clicked.connect(self.on_save_file)
         self.toolButton_resetFrame.clicked.connect(self.static_reset_plot_view)
         self.toolButton_zoomIn.clicked.connect(self.on_zoom_in)
         self.toolButton_zoomOut.clicked.connect(self.on_zoom_out)
@@ -330,9 +332,13 @@ class MCA_MainUI(QMainWindow, Ui_MainWindow, QApplication):
 
             self.flag_measure_changing = True
             if o_time:
+                self.doubleSpinBox_measure_time.setEnabled(False)
+                self.doubleSpinBox_measure_rate.setEnabled(False)
                 self.doubleSpinBox_measure_time.setValue(o_time)
                 self.doubleSpinBox_measure_rate.setValue(total_count / o_time)
             else:
+                self.doubleSpinBox_measure_time.setEnabled(True)
+                self.doubleSpinBox_measure_rate.setEnabled(True)
                 if measure_update == "measure_rate":
                     if self.doubleSpinBox_measure_time.value():
                         self.doubleSpinBox_measure_rate.setValue(total_count / self.doubleSpinBox_measure_time.value())
@@ -559,11 +565,18 @@ class MCA_MainUI(QMainWindow, Ui_MainWindow, QApplication):
     def static_update_windowTitle(self):
         current_curve = self.static_get_current_curve()
         if current_curve is None:
-            self.setWindowTitle("核脉冲数据生成分析")
+            self.setWindowTitle("Pucleus 核脉冲数据生成分析")
         else:
-            self.setWindowTitle("核脉冲数据生成分析 - {}".format(
+            self.setWindowTitle("Pucleus 核脉冲数据生成分析 - {}".format(
                 current_curve[self.file_unpack_dict["filename"]]
             ))
+
+    def static_output_tch(self, filename):
+        curve = self.static_get_current_curve()[self.file_unpack_dict["current_mca"]]
+        if curve is None:
+            return
+        assert isinstance(curve, MCA)
+        curve.to_file(filename)
 
     def do_draw_pulse(self, data):
         total_time = data[0][-1]
@@ -840,6 +853,15 @@ class MCA_MainUI(QMainWindow, Ui_MainWindow, QApplication):
             smo = smooth.BaryCenter(plot[self.file_unpack_dict["current_mca"]])
             plot[self.file_unpack_dict["current_mca"]] = smo(arg)
 
+        elif method == 2:  # 最小二乘法
+            h = self.spinBox_smooth_LSM_h.value()
+            dots = self.spinBox_smooth_LSM_dots.value()
+            msg = "{} 点{} 间距{}".format(dots, method_str, h)
+            plot[self.file_unpack_dict["smoothed"]].append(msg)
+            m = (dots - 1) // 2
+            smo = smooth.PolynomialLeastSquareMethod(plot[self.file_unpack_dict["current_mca"]])
+            plot[self.file_unpack_dict["current_mca"]] = smo(m, h)
+
         self.static_flush_graph()
         self.static_update_overview()
         self.toolButton_smooth.setChecked(False)
@@ -854,9 +876,10 @@ class MCA_MainUI(QMainWindow, Ui_MainWindow, QApplication):
 
             if not self.tabWidget_top.isTabVisible(1):
                 self.tabWidget_top.setTabVisible(1, True)
-            self.tabWidget_top.setCurrentIndex(1)
+
         else:
-            self.tabWidget_top.setCurrentIndex(0)
+            self.tabWidget_top.setTabVisible(1, False)
+            self.stackedWidget_tool.setCurrentIndex(0)
             self.static_infoTab_to_default()
 
     def on_tool_section_clicked(self):
@@ -1008,6 +1031,23 @@ class MCA_MainUI(QMainWindow, Ui_MainWindow, QApplication):
                 pop_notice(QMessageBox.Warning, "错误", '能谱数据读取失败，请检查文件是否正确。\n\n{}'.format(err))
                 break
 
+    def on_save_file(self):
+        local_header = "saver"
+        name = self.static_get_current_curve()
+        if name is None:
+            return
+        name = name[self.file_unpack_dict["filename"]]
+        filename = QFileDialog.getSaveFileName(caption="导出/另存为",
+                                               directory="{}.chn".format(name.split(".")[0]),
+                                               filter="CHN ORTEC能谱 (*.chn);;"
+                                                      "TXT-ASCII (*.txt);;"
+                                                      "MCA-ASCII (*.mca);;"
+                                                      "TCH 原创能谱 (*.tch)",
+                                               parent=self)[0]
+        if filename:
+            self.static_output_tch(filename)
+            self.static_add_file(MCA(filename), filename)
+
     def on_action_exportLog(self):
         local_header = "export"
         filename = QFileDialog.getSaveFileName(caption="导出",
@@ -1037,9 +1077,10 @@ class MCA_MainUI(QMainWindow, Ui_MainWindow, QApplication):
         open_after = self.checkBox_pulse_openLater.isChecked()
         current_name = self.static_get_current_curve()[
             self.file_unpack_dict["filename"]
-        ]
+        ].split(".")[0]
 
         filenames = QFileDialog.getSaveFileName(caption="保存",
+                                                directory="{}.tps".format(current_name),
                                                 filter="核脉冲文件 (*.tps);;"
                                                        "所有文件类型 (*)",
                                                 parent=self)
