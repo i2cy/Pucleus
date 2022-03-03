@@ -347,6 +347,7 @@ class MCA_MainUI(QMainWindow, Ui_MainWindow, QApplication):
 
             self.label_filename.setText(ele[self.file_unpack_dict["filename"]])
             self.label_smooth.setText(smooth_methods)
+            # print(self.K_energy_a, self.K_energy_b)
             if self.flag_energyX_available:
                 self.label_energyXclac.setText("已校正, a:{:.4f}, b:{:.4f}".format(
                     self.K_energy_a, self.K_energy_b))

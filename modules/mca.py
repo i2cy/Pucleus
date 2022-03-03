@@ -320,10 +320,10 @@ class MCA(object):
             self.total_time = int().from_bytes(total_time, "little", signed=False)
 
             enX_a = data[14:18]  # 4B 能量刻度参数A
-            self.energyX_a = int().from_bytes(enX_a, "little", signed=True) / 1000000
+            self.energyX_a = struct.unpack("f", enX_a)[0]
 
             enX_b = data[18:22]  # 4B 能量刻度参数B
-            self.energyX_b = int().from_bytes(enX_b, "little", signed=True) / 1000000
+            self.energyX_b = struct.unpack("f", enX_b)[0]
 
             sha = data[22:54]  # 32B 全文除此字段的sha256校验和
             hasher = hashlib.sha256()
@@ -381,10 +381,10 @@ class MCA(object):
             total_time = total_time.to_bytes(3, "little", signed=False)
             data += total_time
 
-            enX_a = self.energyX_a.to_bytes(4, "little", signed=False)
+            enX_a = struct.pack("f", self.energyX_a)
             data += enX_a
 
-            enX_b = self.energyX_b.to_bytes(4, "little", signed=False)
+            enX_b = struct.pack("f", self.energyX_b)
             data += enX_b
 
             data_raw = self.data.astype(np.uint32).tobytes()
@@ -609,10 +609,10 @@ class Pulses(object):
             # print(self.__len__)
 
             enX_a = data[14:18]  # 4B 能量刻度参数A
-            self.energyX_a = int().from_bytes(enX_a, "little", signed=True) / 1000000
+            self.energyX_a = struct.unpack("f", enX_a)[0]
 
             enX_b = data[18:22]  # 4B 能量刻度参数B
-            self.energyX_b = int().from_bytes(enX_b, "little", signed=True) / 1000000
+            self.energyX_b = struct.unpack("f", enX_b)[0]
 
             sha = data[22:54]  # 32B 全文除此字段的sha256校验和
             hasher = hashlib.sha256()
@@ -659,10 +659,10 @@ class Pulses(object):
         total_time = int(total_time).to_bytes(3, "little", signed=False)
         data += total_time
 
-        enX_a = int(self.energyX_a).to_bytes(4, "little", signed=False)
+        enX_a = struct.pack("f", self.energyX_a)
         data += enX_a
 
-        enX_b = int(self.energyX_b).to_bytes(4, "little", signed=False)
+        enX_b = struct.pack("f", self.energyX_b)
         data += enX_b
 
         data_raw = self.data.astype(np.uint32).tobytes()
