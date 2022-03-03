@@ -20,6 +20,7 @@ from modules.utils import ColorManager, get_R_square, ModLogger, Mod_PlotWidget
 import modules.smooth as smooth
 from modules.energy_axis import linear_regression
 from modules.threads import PulseGenThread, UpdatePulseInfoThread
+from modules.find_peek import SimpleCompare, Peek
 
 
 class MCA_MainUI(QMainWindow, Ui_MainWindow, QApplication):
@@ -206,6 +207,8 @@ class MCA_MainUI(QMainWindow, Ui_MainWindow, QApplication):
         self.vLine = pg.InfiniteLine(angle=90, movable=False)
         self.vLine.setPen(pg.mkPen(color=(255, 255, 0, 0), width=1.5))
 
+        self.vLine_peek_ROI = pg.FillBetweenItem()
+
         self.section_item = pg.LinearRegionItem(pen=pg.mkPen(color=(255, 200, 0, 0), width=1.5))
         self.section_item.setMovable(False)
         self.do_hide_section()
@@ -214,6 +217,7 @@ class MCA_MainUI(QMainWindow, Ui_MainWindow, QApplication):
         self.plot_window.addItem(self.vLine)
         self.plot_window.addItem(self.label)
         self.plot_window.addItem(self.section_item)
+        self.plot_window.addItem(self.vLine_peek_ROI)
         self.plot_window.plotItem.getViewBox().disableAutoRange()
         # self.plot_window.plotItem.disableAutoScale()
 
@@ -257,6 +261,8 @@ class MCA_MainUI(QMainWindow, Ui_MainWindow, QApplication):
             "pulse": 10
         }
         self.files = []
+
+        self.peeks = []
 
         """
         [channel, energy]
@@ -584,6 +590,33 @@ class MCA_MainUI(QMainWindow, Ui_MainWindow, QApplication):
     def static_clear_pulseInfo(self):
         self.pulse_plot_window.clear()
         self.pulse_plot_time_window.clear()
+
+    def static_update_findPeekInfo(self):
+        self.listWidget_findPeek_peeks.clear()
+        for i, ele in enumerate(self.peeks):
+            assert isinstance(ele, Peek)
+            peek_location = ele.peek_location()
+            peek = "{}. 峰位 {} ch".format(i+1, peek_location)
+            if self.flag_energyX_available:
+                peek += " {} KeV".format(self.static_channel_2_energy(peek_location))
+            list_item = QListWidgetItem(peek, parent=self.listWidget_file)
+            self.listWidget_findPeek_peeks.addItem(list_item)
+
+    def do_find_peeks(self):
+
+        curve = self.static_get_current_curve()[self.file_unpack_dict["current_mca"]]
+        if not isinstance(curve, MCA):
+            return
+        algorithm = self.comboBox_findPeek_algo.currentText()
+        ranges = self.static_get_section()
+        pf = []
+        if algorithm == "简单比较法":
+            k = self.doubleSpinBox_findPeek_sc_K.value()
+            m = self.spinBox_findPeek_sc_M.value()
+            pf = SimpleCompare(curve, scan_range=ranges, k=k, m=m)
+
+        self.peeks = pf
+        self.static_update_findPeekInfo()
 
     def do_draw_pulse(self, data):
         total_time = data[0][-1]

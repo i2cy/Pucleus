@@ -27,6 +27,8 @@ class PeekFinder(object):
         self.__index = 0
 
     def __len__(self):
+        if not self.flag_searched:
+            self.search()
         return len(self.peeks)
 
     def __getitem__(self, item):
@@ -41,10 +43,14 @@ class PeekFinder(object):
         return self.peeks[item]
 
     def __iter__(self):
+        if not self.flag_searched:
+            self.search()
         self.__index = 0
         return self
 
     def __next__(self):
+        if not self.flag_searched:
+            self.search()
         if self.__index >= len(self.peeks):
             raise StopIteration
         else:
@@ -89,6 +95,27 @@ class Peek(object):
         plt.plot(top, color="red")
 
         plt.show()
+
+    def area(self):
+        ret = self.__mca_data[self.left_edge: self.right_edge].sum()
+        return ret
+
+    def pure_area(self):
+        ret = self.get_area()
+        noise = self.__mca_data[self.left_edge] + self.__mca_data[self.right_edge]
+        noise *= self.right_edge - self.left_edge
+        noise /= 2
+        ret -= noise
+        return ret
+
+    def peek_location(self):
+        ret = self.position
+        a = self.__mca_data[self.position + 1] - self.__mca_data[self.position - 1]
+        a /= 2 * self.__mca_data[self.position] - self.__mca_data[self.position + 1] - \
+             self.__mca_data[self.position - 1]
+        a /= 2
+        ret += a
+        return ret
 
 
 class SimpleCompare(PeekFinder):

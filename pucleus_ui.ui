@@ -777,9 +777,107 @@
               </item>
               <item>
                <property name="text">
-                <string>高斯乘积法</string>
+                <string>导数法</string>
                </property>
               </item>
+             </widget>
+            </item>
+            <item>
+             <widget class="QStackedWidget" name="stackedWidget_findPeek">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="currentIndex">
+               <number>1</number>
+              </property>
+              <widget class="QWidget" name="page_simpleCompare">
+               <layout class="QHBoxLayout" name="horizontalLayout_8">
+                <item>
+                 <widget class="QLabel" name="label_62">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="text">
+                   <string>寻峰阈值：</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QDoubleSpinBox" name="doubleSpinBox_findPeek_sc_K">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="toolTip">
+                   <string>寻峰阈值，一般在1~1.5之间</string>
+                  </property>
+                  <property name="singleStep">
+                   <double>0.100000000000000</double>
+                  </property>
+                  <property name="value">
+                   <double>1.000000000000000</double>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLabel" name="label_63">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="text">
+                   <string>寻峰宽度因子：</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QSpinBox" name="spinBox_findPeek_sc_M">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="toolTip">
+                   <string>寻峰宽度因子，越小寻峰灵敏度越高</string>
+                  </property>
+                  <property name="minimum">
+                   <number>1</number>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
+              <widget class="QWidget" name="page_div">
+               <layout class="QHBoxLayout" name="horizontalLayout_9">
+                <item>
+                 <widget class="QLabel" name="label_64">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="text">
+                   <string>阶数：</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QSpinBox" name="spinBox"/>
+                </item>
+               </layout>
+              </widget>
              </widget>
             </item>
             <item>
@@ -1462,7 +1560,7 @@
                        </widget>
                       </item>
                       <item row="0" column="1">
-                       <widget class="QLabel" name="label_59">
+                       <widget class="QLabel" name="label_findPeek_range">
                         <property name="sizePolicy">
                          <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
                           <horstretch>0</horstretch>
@@ -1470,19 +1568,19 @@
                          </sizepolicy>
                         </property>
                         <property name="text">
-                         <string>0ch (0 KeV) - 1024ch (0 Kev)</string>
-                        </property>
-                       </widget>
-                      </item>
-                      <item row="1" column="0">
-                       <widget class="QLabel" name="label_60">
-                        <property name="text">
-                         <string>峰列表：</string>
+                         <string>按住Ctrl拖动鼠标快速选择区域</string>
                         </property>
                        </widget>
                       </item>
                       <item row="2" column="0" colspan="2">
-                       <widget class="QListWidget" name="listWidget"/>
+                       <widget class="QListWidget" name="listWidget_findPeek_peeks"/>
+                      </item>
+                      <item row="1" column="0" colspan="2">
+                       <widget class="QLabel" name="label_60">
+                        <property name="text">
+                         <string>峰列表（选中以查看详情）：</string>
+                        </property>
+                       </widget>
                       </item>
                      </layout>
                     </widget>
@@ -1490,7 +1588,7 @@
                   </item>
                  </layout>
                 </widget>
-                <widget class="QWidget" name="page_info_smooth"/>
+                <widget class="QWidget" name="page_info_library"/>
                 <widget class="QWidget" name="page_mca2Pulse">
                  <layout class="QGridLayout" name="gridLayout_11">
                   <property name="leftMargin">
@@ -1518,8 +1616,8 @@
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>174</width>
-                       <height>96</height>
+                       <width>363</width>
+                       <height>361</height>
                       </rect>
                      </property>
                      <layout class="QGridLayout" name="gridLayout_9">
@@ -1813,61 +1911,6 @@
                   </rect>
                  </property>
                  <layout class="QGridLayout" name="gridLayout_10">
-                  <item row="1" column="2">
-                   <widget class="QToolButton" name="toolButton_file_close">
-                    <property name="sizePolicy">
-                     <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-                      <horstretch>0</horstretch>
-                      <verstretch>0</verstretch>
-                     </sizepolicy>
-                    </property>
-                    <property name="toolTip">
-                     <string>关闭所选文件 (Del)</string>
-                    </property>
-                    <property name="text">
-                     <string>关闭</string>
-                    </property>
-                    <property name="icon">
-                     <iconset resource="resources.qrc">
-                      <normaloff>:/图标/assets/minus_640.svg</normaloff>:/图标/assets/minus_640.svg</iconset>
-                    </property>
-                    <property name="shortcut">
-                     <string>Del</string>
-                    </property>
-                    <property name="autoRaise">
-                     <bool>true</bool>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="0" column="0" colspan="8">
-                   <widget class="QListWidget" name="listWidget_file">
-                    <property name="sizePolicy">
-                     <sizepolicy hsizetype="Ignored" vsizetype="Expanding">
-                      <horstretch>0</horstretch>
-                      <verstretch>0</verstretch>
-                     </sizepolicy>
-                    </property>
-                    <property name="dragEnabled">
-                     <bool>true</bool>
-                    </property>
-                    <property name="sortingEnabled">
-                     <bool>true</bool>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="1" column="5">
-                   <spacer name="horizontalSpacer_6">
-                    <property name="orientation">
-                     <enum>Qt::Horizontal</enum>
-                    </property>
-                    <property name="sizeHint" stdset="0">
-                     <size>
-                      <width>40</width>
-                      <height>20</height>
-                     </size>
-                    </property>
-                   </spacer>
-                  </item>
                   <item row="1" column="4">
                    <widget class="QToolButton" name="toolButton_file_hide">
                     <property name="sizePolicy">
@@ -1914,6 +1957,61 @@
                     <property name="icon">
                      <iconset resource="resources.qrc">
                       <normaloff>:/图标/assets/plus_640.svg</normaloff>:/图标/assets/plus_640.svg</iconset>
+                    </property>
+                    <property name="autoRaise">
+                     <bool>true</bool>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="5">
+                   <spacer name="horizontalSpacer_6">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>40</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                  <item row="0" column="0" colspan="8">
+                   <widget class="QListWidget" name="listWidget_file">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Ignored" vsizetype="Expanding">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="dragEnabled">
+                     <bool>true</bool>
+                    </property>
+                    <property name="sortingEnabled">
+                     <bool>true</bool>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="2">
+                   <widget class="QToolButton" name="toolButton_file_close">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="toolTip">
+                     <string>关闭所选文件 (Del)</string>
+                    </property>
+                    <property name="text">
+                     <string>关闭</string>
+                    </property>
+                    <property name="icon">
+                     <iconset resource="resources.qrc">
+                      <normaloff>:/图标/assets/minus_640.svg</normaloff>:/图标/assets/minus_640.svg</iconset>
+                    </property>
+                    <property name="shortcut">
+                     <string>Del</string>
                     </property>
                     <property name="autoRaise">
                      <bool>true</bool>
@@ -2137,6 +2235,101 @@ p, li { white-space: pre-wrap; }
               </item>
              </layout>
             </widget>
+            <widget class="QWidget" name="tab_library">
+             <attribute name="title">
+              <string>库</string>
+             </attribute>
+             <layout class="QVBoxLayout" name="verticalLayout_7">
+              <item>
+               <widget class="QScrollArea" name="scrollArea_7">
+                <property name="frameShape">
+                 <enum>QFrame::NoFrame</enum>
+                </property>
+                <property name="widgetResizable">
+                 <bool>true</bool>
+                </property>
+                <widget class="QWidget" name="scrollAreaWidgetContents_7">
+                 <property name="geometry">
+                  <rect>
+                   <x>0</x>
+                   <y>0</y>
+                   <width>363</width>
+                   <height>361</height>
+                  </rect>
+                 </property>
+                 <layout class="QGridLayout" name="gridLayout_13">
+                  <item row="0" column="0" colspan="2">
+                   <widget class="QLabel" name="label_61">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
+                    <property name="text">
+                     <string>核素库：</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="0" colspan="3">
+                   <widget class="QListView" name="listView_libraries"/>
+                  </item>
+                  <item row="2" column="0">
+                   <widget class="QToolButton" name="toolButton_library_add">
+                    <property name="toolTip">
+                     <string>添加核素库</string>
+                    </property>
+                    <property name="text">
+                     <string/>
+                    </property>
+                    <property name="icon">
+                     <iconset resource="resources.qrc">
+                      <normaloff>:/图标/assets/plus_640.svg</normaloff>:/图标/assets/plus_640.svg</iconset>
+                    </property>
+                    <property name="autoRaise">
+                     <bool>true</bool>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="2" column="1">
+                   <widget class="QToolButton" name="toolButton_library_remove">
+                    <property name="toolTip">
+                     <string>移除所选库 (Del)</string>
+                    </property>
+                    <property name="text">
+                     <string/>
+                    </property>
+                    <property name="icon">
+                     <iconset resource="resources.qrc">
+                      <normaloff>:/图标/assets/minus_640.svg</normaloff>:/图标/assets/minus_640.svg</iconset>
+                    </property>
+                    <property name="shortcut">
+                     <string>Del</string>
+                    </property>
+                    <property name="autoRaise">
+                     <bool>true</bool>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="2" column="2">
+                   <spacer name="horizontalSpacer_9">
+                    <property name="orientation">
+                     <enum>Qt::Horizontal</enum>
+                    </property>
+                    <property name="sizeHint" stdset="0">
+                     <size>
+                      <width>270</width>
+                      <height>20</height>
+                     </size>
+                    </property>
+                   </spacer>
+                  </item>
+                 </layout>
+                </widget>
+               </widget>
+              </item>
+             </layout>
+            </widget>
            </widget>
           </item>
          </layout>
@@ -2200,16 +2393,6 @@ p, li { white-space: pre-wrap; }
     <addaction name="separator"/>
     <addaction name="action_exportLog"/>
    </widget>
-   <widget class="QMenu" name="menu_2">
-    <property name="title">
-     <string>工具</string>
-    </property>
-    <addaction name="action_smooth"/>
-    <addaction name="action_findPeek"/>
-    <addaction name="separator"/>
-    <addaction name="action_calabration"/>
-    <addaction name="action_calabrateEngergyX"/>
-   </widget>
    <widget class="QMenu" name="menu_3">
     <property name="title">
      <string>编辑</string>
@@ -2234,7 +2417,6 @@ p, li { white-space: pre-wrap; }
    </widget>
    <addaction name="menu"/>
    <addaction name="menu_3"/>
-   <addaction name="menu_2"/>
    <addaction name="menu_4"/>
    <addaction name="menu_5"/>
   </widget>
@@ -2314,7 +2496,7 @@ p, li { white-space: pre-wrap; }
   </action>
   <action name="action_export_chn">
    <property name="text">
-    <string>导出谱线 (S)</string>
+    <string>导出谱线</string>
    </property>
    <property name="toolTip">
     <string>导出谱线</string>
