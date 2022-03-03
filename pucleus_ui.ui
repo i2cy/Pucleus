@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1620</width>
-    <height>1080</height>
+    <height>975</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -1092,7 +1092,7 @@
                    <x>0</x>
                    <y>0</y>
                    <width>342</width>
-                   <height>443</height>
+                   <height>437</height>
                   </rect>
                  </property>
                  <layout class="QGridLayout" name="gridLayout_15" rowstretch="0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0">
@@ -1518,8 +1518,8 @@
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>363</width>
-                       <height>361</height>
+                       <width>174</width>
+                       <height>96</height>
                       </rect>
                      </property>
                      <layout class="QGridLayout" name="gridLayout_9">

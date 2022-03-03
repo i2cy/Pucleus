@@ -14,7 +14,7 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, \
     QSizePolicy, QListWidgetItem, QMessageBox
 from PyQt5.QtGui import QIcon, QImage, QPixmap, QKeyEvent, QMouseEvent
 from PyQt5.QtCore import Qt
-from ui.mainWindow import Ui_MainWindow
+from pucleus_ui import Ui_MainWindow
 from modules.mca import MCA, Pulses
 from modules.utils import ColorManager, get_R_square, ModLogger, Mod_PlotWidget
 import modules.smooth as smooth
