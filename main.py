@@ -8,21 +8,18 @@
 
 import sys
 import os
-import time
 import pyqtgraph as pg
 import numpy as np
-import random
 from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, \
-    QSizePolicy, QListWidgetItem, QMessageBox, QFrame
+    QSizePolicy, QListWidgetItem, QMessageBox
 from PyQt5.QtGui import QIcon, QImage, QPixmap, QKeyEvent, QMouseEvent
-from PyQt5.QtCore import Qt, QSize, QThread
-from i2cylib.utils.logger.logger import Logger
-from mainWindow import Ui_MainWindow
+from PyQt5.QtCore import Qt
+from ui.mainWindow import Ui_MainWindow
 from modules.mca import MCA, Pulses
 from modules.utils import ColorManager, get_R_square, ModLogger, Mod_PlotWidget
 import modules.smooth as smooth
 from modules.energy_axis import linear_regression
-from modules.threads import PulseGenThread, UpdatePulseInfoThread, TestThread
+from modules.threads import PulseGenThread, UpdatePulseInfoThread
 
 
 class MCA_MainUI(QMainWindow, Ui_MainWindow, QApplication):
