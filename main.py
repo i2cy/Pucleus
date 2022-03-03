@@ -92,6 +92,8 @@ class MCA_MainUI(QMainWindow, Ui_MainWindow, QApplication):
 
         self.listWidget_file.itemSelectionChanged.connect(self.on_file_changed)
 
+        self.pushButton_pulseInfo_draw.clicked.connect(self.static_update_pulseInfo)
+
         # prob gragh init
         pg.setConfigOption('background', 'w')
         pg.setConfigOption('foreground', 'k')
@@ -576,7 +578,14 @@ class MCA_MainUI(QMainWindow, Ui_MainWindow, QApplication):
         if curve is None:
             return
         assert isinstance(curve, MCA)
+        if self.flag_energyX_available and not curve.energyX_a:
+            curve.energyX_a = self.K_energy_a
+            curve.energyX_b = self.K_energy_b
         curve.to_file(filename)
+
+    def static_clear_pulseInfo(self):
+        self.pulse_plot_window.clear()
+        self.pulse_plot_time_window.clear()
 
     def do_draw_pulse(self, data):
         total_time = data[0][-1]
@@ -961,7 +970,8 @@ class MCA_MainUI(QMainWindow, Ui_MainWindow, QApplication):
         self.static_topBar_update()
         self.static_flush_graph()
         self.static_update_overview()
-        self.static_update_pulseInfo()
+        self.static_clear_pulseInfo()
+        # self.static_update_pulseInfo()
         self.static_update_windowTitle()
 
     def on_mouse_clicked(self, evt):
@@ -1020,7 +1030,8 @@ class MCA_MainUI(QMainWindow, Ui_MainWindow, QApplication):
     def on_open_file(self):
         local_header = "openfile"
         filenames = QFileDialog.getOpenFileNames(caption="打开",
-                                                 filter="能谱文件 (*.chn; *.tch; *.mca; *.txt);;"
+                                                 filter="所有支持的文件格式 (*.chn; *.tch; *.mca; *.txt; *.tps);;"
+                                                        "能谱文件 (*.chn; *.tch; *.mca; *.txt);;"
                                                         "核脉冲文件 (*.tps);;"
                                                         "所有文件类型 (*)",
                                                  parent=self)[0]

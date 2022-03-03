@@ -10,7 +10,6 @@ import time
 import hashlib
 import struct
 
-
 DICT_DATE = {1: "Jan",
              2: "Feb",
              3: "Mar",
@@ -217,24 +216,56 @@ class MCA(object):
 
     def from_file(self, filename):
         if filename[-3:] in ("mca", "txt"):
-            f = open(filename, 'r')
+            f = open(filename, 'r', encoding="utf-8")
             data_raw = []
             data = f.readlines()
 
             for i, ele in enumerate(data):
-                if ele and ele[0] == "#":
-                    continue
                 while len(ele) > 1 and ele[-1] in ("\r", "\n"):
                     ele = ele[:-1]
                 if ele:
-                    data_raw.append(int(ele))
+                    if ele[0] == "#":
+                        if ":" not in ele:
+                            continue
+                        t = ele.replace(" ", "").split(":")
+                        if "version" in ele.lower():
+                            self.version = int(t[-1])
+                        elif "mca detector id" in ele.lower():
+                            self.mca_detector_id = int(t[-1])
+                        elif "start time" in ele.lower():
+                            self.start_time_hhmm = t[-3] + t[-2]
+                            self.start_time_ss = t[-1]
+                            self.start_time_hhmm.encode()
+                            self.start_time_ss.encode()
+                        elif "start date" in ele.lower():
+                            self.start_date = t[-1].encode()
+                        elif "no channels" in ele.lower():
+                            self.channels = int(t[-1])
+                        elif "live time" in ele.lower():
+                            self.live_time = int(t[-1])
+                            self.total_time = self.live_time / 50
+                        elif "real time" in ele.lower():
+                            self.real_time = int(t[-1])
+                        elif "#a:" in ele.lower().replace(" ", ""):
+                            self.energyX_b = float(t[-1])
+                        elif "#b:" in ele.lower().replace(" ", ""):
+                            self.energyX_a = float(t[-1])
+                        elif "#c:" in ele.lower().replace(" ", ""):
+                            self.energyX_c = float(t[-1])
+                    else:
+                        data_raw.append(int(ele))
 
-            data_t = data_raw[:-1]
+            tail = True
+            while len(data_raw) > self.channels:
+                if tail:
+                    data_raw = data_raw[:-1]
+                    tail = False
+                    for i in range(6):
+                        data_raw[i] = 0
+                else:
+                    data_raw = data_raw[1:]
 
-            for i in range(5):
-                data_t[i] = 0
-
-            self.data = np.array(data_t, dtype=np.float64)
+            self.data = np.array(data_raw, dtype=np.float64)
             self.channels = len(self.data)
 
         elif filename[-3:] == "chn":
@@ -367,8 +398,23 @@ class MCA(object):
             data += data_raw
 
         elif file_end in ("txt", "mca"):
+            data += "# Filename: {}\r\n".format(filename).encode()
+            data += "# Version: {}\r\n".format(self.version).encode()
+            data += "# MCA detector ID: {}\r\n".format(self.mca_detector_id).encode()
+            data += "# Start time: {}:{}:{}\r\n".format(self.start_time_hhmm[:2].decode(),
+                                                        self.start_time_hhmm[2:].decode(),
+                                                        self.start_time_ss.decode()).encode()
+            data += "# Start date: {}\r\n".format(self.start_date.decode()).encode()
+            data += "# No channels: {}\r\n".format(self.channels).encode()
+            data += "# Live time: {}\r\n".format(self.live_time).encode()
+            data += "# Real time: {}\r\n".format(self.real_time).encode()
+            if self.energyX_a:
+                data += "# En cal factors A + B*x + C*x*x\r\n".encode()
+                data += "# A : {}\r\n".format(self.energyX_b).encode()
+                data += "# B : {}\r\n".format(self.energyX_a).encode()
+                data += "# C : {}\r\n".format(self.energyX_c).encode()
             for i in self.data:
-                data += str(i).encode()
+                data += str(int(i)).encode()
                 data += b"\r\n"
 
         elif file_end == "chn":
@@ -422,7 +468,7 @@ class MCA(object):
         pulses = self.to_pulses(int(csp_rate * total_time))
         pulses = pulses.data
 
-        time_x = np.linspace(0, -np.log(10**-9) / csp_rate, 8193, dtype=np.float64)
+        time_x = np.linspace(0, -np.log(10 ** -9) / csp_rate, 8193, dtype=np.float64)
         time_x0 = time_x[0: 8192].copy()
         time_x1 = time_x[1: 8193].copy()
 
@@ -443,16 +489,20 @@ class MCA(object):
             t = rand >= i
             time_res_index += t
 
-        #print(len(time_p), len(time_p_sum), np.max(time_res_index), np.min(time_res_index))
-        time_x0 *= 10**6
+        # print(len(time_p), len(time_p_sum), np.max(time_res_index), np.min(time_res_index))
+        time_x0 *= 10 ** 6
 
         time_res = [int(time_x0[ele]) for ele in time_res_index]
 
-        #print(pulses.ndim, pulses.ndim)
+        # print(pulses.ndim, pulses.ndim)
         res = np.dstack((pulses, time_res)).astype(np.uint32)
         res = np.squeeze(res)
         ret = Pulses(res)
         ret.total_time = total_time
+        ret.energyX_a = self.energyX_a
+        ret.energyX_b = self.energyX_b
+        ret.timestamp = int(time.time() * 1000)
+        ret.channels = self.channels
 
         return ret
 
@@ -532,7 +582,7 @@ class Pulses(object):
         time_abs = np.zeros(len(self.data), dtype=np.float64)
         for i, ele in enumerate(self.data[:, 1]):
             time_abs[i] = time_i
-            time_i += ele / 10**6
+            time_i += ele / 10 ** 6
 
         return time_abs
 

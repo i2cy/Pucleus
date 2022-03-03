@@ -30,8 +30,8 @@
      <verstretch>0</verstretch>
     </sizepolicy>
    </property>
-   <layout class="QGridLayout" name="gridLayout_2">
-    <item row="0" column="1">
+   <layout class="QVBoxLayout" name="verticalLayout_5">
+    <item>
      <layout class="QGridLayout" name="gridLayout">
       <property name="sizeConstraint">
        <enum>QLayout::SetDefaultConstraint</enum>
@@ -1420,9 +1420,76 @@
                  </sizepolicy>
                 </property>
                 <property name="currentIndex">
-                 <number>2</number>
+                 <number>0</number>
                 </property>
-                <widget class="QWidget" name="page_info_findPeek"/>
+                <widget class="QWidget" name="page_info_findPeek">
+                 <layout class="QVBoxLayout" name="verticalLayout_6">
+                  <item>
+                   <widget class="QScrollArea" name="scrollArea_6">
+                    <property name="frameShape">
+                     <enum>QFrame::NoFrame</enum>
+                    </property>
+                    <property name="widgetResizable">
+                     <bool>true</bool>
+                    </property>
+                    <widget class="QWidget" name="scrollAreaWidgetContents_6">
+                     <property name="geometry">
+                      <rect>
+                       <x>0</x>
+                       <y>0</y>
+                       <width>341</width>
+                       <height>339</height>
+                      </rect>
+                     </property>
+                     <layout class="QGridLayout" name="gridLayout_2">
+                      <property name="leftMargin">
+                       <number>0</number>
+                      </property>
+                      <property name="topMargin">
+                       <number>0</number>
+                      </property>
+                      <property name="rightMargin">
+                       <number>0</number>
+                      </property>
+                      <property name="bottomMargin">
+                       <number>0</number>
+                      </property>
+                      <item row="0" column="0">
+                       <widget class="QLabel" name="label_58">
+                        <property name="text">
+                         <string>寻峰范围：</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item row="0" column="1">
+                       <widget class="QLabel" name="label_59">
+                        <property name="sizePolicy">
+                         <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                          <horstretch>0</horstretch>
+                          <verstretch>0</verstretch>
+                         </sizepolicy>
+                        </property>
+                        <property name="text">
+                         <string>0ch (0 KeV) - 1024ch (0 Kev)</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item row="1" column="0">
+                       <widget class="QLabel" name="label_60">
+                        <property name="text">
+                         <string>峰列表：</string>
+                        </property>
+                       </widget>
+                      </item>
+                      <item row="2" column="0" colspan="2">
+                       <widget class="QListWidget" name="listWidget"/>
+                      </item>
+                     </layout>
+                    </widget>
+                   </widget>
+                  </item>
+                 </layout>
+                </widget>
                 <widget class="QWidget" name="page_info_smooth"/>
                 <widget class="QWidget" name="page_mca2Pulse">
                  <layout class="QGridLayout" name="gridLayout_11">
@@ -1530,50 +1597,25 @@
                    <x>0</x>
                    <y>0</y>
                    <width>342</width>
-                   <height>470</height>
+                   <height>483</height>
                   </rect>
                  </property>
                  <layout class="QGridLayout" name="gridLayout_12">
-                  <item row="4" column="1">
-                   <widget class="QLabel" name="label_43">
+                  <item row="0" column="2" colspan="3">
+                   <widget class="QLabel" name="label_29">
+                    <property name="sizePolicy">
+                     <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+                      <horstretch>0</horstretch>
+                      <verstretch>0</verstretch>
+                     </sizepolicy>
+                    </property>
                     <property name="text">
-                     <string/>
+                     <string>脉冲浏览（模拟核脉冲）：</string>
                     </property>
                    </widget>
                   </item>
-                  <item row="14" column="1">
-                   <widget class="QLabel" name="label_48">
-                    <property name="text">
-                     <string/>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="6" column="1">
-                   <widget class="QLabel" name="label_50">
-                    <property name="text">
-                     <string/>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="11" column="2" rowspan="8" colspan="3">
-                   <layout class="QVBoxLayout" name="verticalLayout_pulse_time_gragh"/>
-                  </item>
-                  <item row="7" column="1">
-                   <widget class="QLabel" name="label_47">
-                    <property name="text">
-                     <string/>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="13" column="1">
-                   <widget class="QLabel" name="label_46">
-                    <property name="text">
-                     <string/>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="1" column="1">
-                   <widget class="QLabel" name="label_39">
+                  <item row="8" column="1">
+                   <widget class="QLabel" name="label_40">
                     <property name="text">
                      <string/>
                     </property>
@@ -1581,13 +1623,6 @@
                   </item>
                   <item row="18" column="1">
                    <widget class="QLabel" name="label_53">
-                    <property name="text">
-                     <string/>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="8" column="1">
-                   <widget class="QLabel" name="label_40">
                     <property name="text">
                      <string/>
                     </property>
@@ -1607,15 +1642,15 @@
                     </property>
                    </widget>
                   </item>
-                  <item row="3" column="1">
-                   <widget class="QLabel" name="label_42">
+                  <item row="2" column="1">
+                   <widget class="QLabel" name="label_41">
                     <property name="text">
                      <string/>
                     </property>
                    </widget>
                   </item>
-                  <item row="11" column="1">
-                   <widget class="QLabel" name="label_52">
+                  <item row="1" column="1">
+                   <widget class="QLabel" name="label_39">
                     <property name="text">
                      <string/>
                     </property>
@@ -1628,14 +1663,90 @@
                     </property>
                    </widget>
                   </item>
-                  <item row="2" column="1">
-                   <widget class="QLabel" name="label_41">
+                  <item row="14" column="1">
+                   <widget class="QLabel" name="label_48">
                     <property name="text">
                      <string/>
                     </property>
                    </widget>
                   </item>
-                  <item row="9" column="4">
+                  <item row="4" column="1">
+                   <widget class="QLabel" name="label_43">
+                    <property name="text">
+                     <string/>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="7" column="1">
+                   <widget class="QLabel" name="label_47">
+                    <property name="text">
+                     <string/>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="10" column="2" colspan="3">
+                   <widget class="QLabel" name="label_51">
+                    <property name="text">
+                     <string>脉冲时间间隔概率密度函数：</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="11" column="2" rowspan="8" colspan="4">
+                   <layout class="QVBoxLayout" name="verticalLayout_pulse_time_gragh"/>
+                  </item>
+                  <item row="16" column="1">
+                   <widget class="QLabel" name="label_44">
+                    <property name="text">
+                     <string/>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="12" column="1">
+                   <widget class="QLabel" name="label_55">
+                    <property name="text">
+                     <string/>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="1" column="2" rowspan="8" colspan="4">
+                   <layout class="QVBoxLayout" name="verticalLayout_pulse_gragh"/>
+                  </item>
+                  <item row="0" column="5">
+                   <widget class="QPushButton" name="pushButton_pulseInfo_draw">
+                    <property name="text">
+                     <string>绘制预览</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="6" column="1">
+                   <widget class="QLabel" name="label_50">
+                    <property name="text">
+                     <string/>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="11" column="1">
+                   <widget class="QLabel" name="label_52">
+                    <property name="text">
+                     <string/>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="13" column="1">
+                   <widget class="QLabel" name="label_46">
+                    <property name="text">
+                     <string/>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="3" column="1">
+                   <widget class="QLabel" name="label_42">
+                    <property name="text">
+                     <string/>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="19" column="2">
                    <spacer name="horizontalSpacer_8">
                     <property name="orientation">
                      <enum>Qt::Horizontal</enum>
@@ -1647,43 +1758,6 @@
                      </size>
                     </property>
                    </spacer>
-                  </item>
-                  <item row="0" column="2" colspan="3">
-                   <widget class="QLabel" name="label_29">
-                    <property name="sizePolicy">
-                     <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
-                      <horstretch>0</horstretch>
-                      <verstretch>0</verstretch>
-                     </sizepolicy>
-                    </property>
-                    <property name="text">
-                     <string>脉冲浏览（模拟核脉冲）：</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="10" column="2" colspan="3">
-                   <widget class="QLabel" name="label_51">
-                    <property name="text">
-                     <string>脉冲时间间隔概率密度函数：</string>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="12" column="1">
-                   <widget class="QLabel" name="label_55">
-                    <property name="text">
-                     <string/>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="16" column="1">
-                   <widget class="QLabel" name="label_44">
-                    <property name="text">
-                     <string/>
-                    </property>
-                   </widget>
-                  </item>
-                  <item row="1" column="2" rowspan="8" colspan="3">
-                   <layout class="QVBoxLayout" name="verticalLayout_pulse_gragh"/>
                   </item>
                  </layout>
                 </widget>
