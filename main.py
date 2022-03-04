@@ -522,7 +522,6 @@ class MCA_MainUI(QMainWindow, Ui_MainWindow, QApplication):
             self.stackedWidget_info.setCurrentIndex(2)
             if plot[self.file_unpack_dict["pulse"]].data.ndim == 2:
                 self.tabWidget_top.setTabVisible(2, True)
-                self.stackedWidget_info.setCurrentIndex(3)
             else:
                 self.tabWidget_top.setTabVisible(2, False)
         else:
@@ -603,13 +602,13 @@ class MCA_MainUI(QMainWindow, Ui_MainWindow, QApplication):
             self.listWidget_findPeek_peeks.addItem(list_item)
 
     def do_find_peeks(self):
-
         curve = self.static_get_current_curve()[self.file_unpack_dict["current_mca"]]
         if not isinstance(curve, MCA):
             return
         algorithm = self.comboBox_findPeek_algo.currentText()
         ranges = self.static_get_section()
         pf = []
+        self.logger.DEBUG("[寻峰] 正在使用 {} 算法在 {} 区域内寻峰".format(algorithm, ranges))
         if algorithm == "简单比较法":
             k = self.doubleSpinBox_findPeek_sc_K.value()
             m = self.spinBox_findPeek_sc_M.value()
@@ -617,6 +616,7 @@ class MCA_MainUI(QMainWindow, Ui_MainWindow, QApplication):
 
         self.peeks = pf
         self.static_update_findPeekInfo()
+        self.logger.INFO("[寻峰] 找到 {} 个峰".format(len(self.peeks)))
 
     def do_draw_pulse(self, data):
         total_time = data[0][-1]
@@ -652,12 +652,25 @@ class MCA_MainUI(QMainWindow, Ui_MainWindow, QApplication):
             section = self.section
         else:
             self.section = list(section)
+        if self.flag_energyX_available:
+            range_text = "{} ch/{:.2f} KeV - {} ch/{:.2f} KeV".format(
+                int(min(section)), self.static_channel_2_energy(min(section)),
+                int(max(section)), self.static_channel_2_energy(max(section))
+            )
+        else:
+            range_text = "{} ch -- {} ch".format(
+                int(min(section)), int(max(section))
+            )
+        if not int(min(section)):
+            range_text = "按住Ctrl拖动鼠标快速选择区域"
+        self.label_findPeek_range.setText(range_text)
         self.section_item.setBrush(color=(230, 180, 0, 50))
         self.section_item.setRegion(section)
-        self.spinBox_section_start.setValue(min(section))
-        self.spinBox_section_end.setValue(max(section))
+        self.spinBox_section_start.setValue(int(min(section)))
+        self.spinBox_section_end.setValue(int(max(section)))
 
     def do_hide_section(self):
+        self.label_findPeek_range.setText("按住Ctrl拖动鼠标快速选择区域")
         self.section_item.setBrush(color=(230, 180, 0, 0))
 
     def do_hide_vlineCurse(self):
