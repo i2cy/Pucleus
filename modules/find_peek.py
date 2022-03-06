@@ -108,6 +108,18 @@ class Peek(object):
         ret -= noise
         return ret
 
+    def get_feature_array(self):
+        ret = np.zeros(len(self.__mca_data), dtype=np.float64)
+        for i, ele in enumerate(self.__mca_data[int(self.left_edge):int(self.right_edge)]):
+            ret[i + int(self.left_edge)] = ele
+        return ret
+
+    def get_reversed_feature_array(self):
+        t = self.get_feature_array()
+        ret = self.__mca_data.copy()
+        ret -= t
+        return ret
+
     def peek_location(self):
         ret = self.position
         a = self.__mca_data[self.position + 1] - self.__mca_data[self.position - 1]
@@ -191,8 +203,8 @@ class SimpleCompare(PeekFinder):
 
         return right_edge
 
-    def search(self, range=None):
-        super(SimpleCompare, self).search(range)
+    def search(self, scan_range=None):
+        super(SimpleCompare, self).search(scan_range)
 
         index = 0
 

@@ -77,6 +77,7 @@ class MCA_MainUI(QMainWindow, Ui_MainWindow, QApplication):
         self.pushButton_smooth_no.clicked.connect(self.on_tool_smooth_clicked)
         self.pushButton_smooth_yes.clicked.connect(self.on_tool_smooth_yes_clicked)
         self.pushButton_findPeek_no.clicked.connect(self.on_tool_findPeek_clicked)
+        self.pushButton_findPeek_yes.clicked.connect(self.do_find_peeks)
 
         self.pushButton_export_pulse.clicked.connect(self.on_export_pulse_buttom_clicked)
 
@@ -89,6 +90,7 @@ class MCA_MainUI(QMainWindow, Ui_MainWindow, QApplication):
         self.comboBox_originalFile.currentTextChanged.connect(self.static_infoTab_rr_update)
 
         self.listWidget_file.itemSelectionChanged.connect(self.on_file_changed)
+        self.listWidget_findPeek_peeks.itemSelectionChanged.connect(self.on_peek_changed)
 
         self.pushButton_pulseInfo_draw.clicked.connect(self.static_update_pulseInfo)
 
@@ -208,6 +210,7 @@ class MCA_MainUI(QMainWindow, Ui_MainWindow, QApplication):
         self.vLine.setPen(pg.mkPen(color=(255, 255, 0, 0), width=1.5))
 
         self.vLine_peek_ROI = pg.FillBetweenItem()
+        pg.PlotDataItem()
 
         self.section_item = pg.LinearRegionItem(pen=pg.mkPen(color=(255, 200, 0, 0), width=1.5))
         self.section_item.setMovable(False)
@@ -373,6 +376,14 @@ class MCA_MainUI(QMainWindow, Ui_MainWindow, QApplication):
             self.spinBox_section_end.setMaximum(len(ele[self.file_unpack_dict["current_mca"]]))
 
             self.flag_measure_changing = False
+        else:
+            self.label_filename.setText("无")
+            self.label_smooth.setText("未光滑")
+            self.label_type.setText("未知")
+            self.label_total_count.setText("0")
+            self.label_max_count.setText("0")
+            self.label_average_count.setText("0")
+            self.prob_plot_window.clear()
 
     def static_reset_plot_view(self):
         if len(self.files):
@@ -517,16 +528,20 @@ class MCA_MainUI(QMainWindow, Ui_MainWindow, QApplication):
             return
         if plot is None:
             plot = self.static_get_current_curve()
-        if plot[self.file_unpack_dict["type"]] == "PUL":
+        if self.toolButton_findPeek.isChecked():
             self.tabWidget_top.setTabVisible(1, True)
-            self.stackedWidget_info.setCurrentIndex(2)
-            if plot[self.file_unpack_dict["pulse"]].data.ndim == 2:
-                self.tabWidget_top.setTabVisible(2, True)
-            else:
-                self.tabWidget_top.setTabVisible(2, False)
+            self.stackedWidget_info.setCurrentIndex(0)
         else:
-            self.tabWidget_top.setTabVisible(1, False)
-            self.tabWidget_top.setTabVisible(2, False)
+            if plot[self.file_unpack_dict["type"]] == "PUL":
+                self.tabWidget_top.setTabVisible(1, True)
+                self.stackedWidget_info.setCurrentIndex(2)
+                if plot[self.file_unpack_dict["pulse"]].data.ndim == 2:
+                    self.tabWidget_top.setTabVisible(2, True)
+                else:
+                    self.tabWidget_top.setTabVisible(2, False)
+            else:
+                self.tabWidget_top.setTabVisible(1, False)
+                self.tabWidget_top.setTabVisible(2, False)
 
     def static_infoTab_rr_update(self):
         original_filename = self.comboBox_originalFile.currentText()
@@ -595,10 +610,10 @@ class MCA_MainUI(QMainWindow, Ui_MainWindow, QApplication):
         for i, ele in enumerate(self.peeks):
             assert isinstance(ele, Peek)
             peek_location = ele.peek_location()
-            peek = "{}. 峰位 {} ch".format(i+1, peek_location)
+            peek = "{}. 峰位 {:.2f} ch".format(i+1, peek_location)
             if self.flag_energyX_available:
-                peek += " {} KeV".format(self.static_channel_2_energy(peek_location))
-            list_item = QListWidgetItem(peek, parent=self.listWidget_file)
+                peek += " {:.2f} KeV".format(self.static_channel_2_energy(peek_location))
+            list_item = QListWidgetItem(peek, parent=self.listWidget_findPeek_peeks)
             self.listWidget_findPeek_peeks.addItem(list_item)
 
     def do_find_peeks(self):
@@ -612,11 +627,25 @@ class MCA_MainUI(QMainWindow, Ui_MainWindow, QApplication):
         if algorithm == "简单比较法":
             k = self.doubleSpinBox_findPeek_sc_K.value()
             m = self.spinBox_findPeek_sc_M.value()
+            ranges = [int(ele) for ele in ranges]
             pf = SimpleCompare(curve, scan_range=ranges, k=k, m=m)
 
         self.peeks = pf
         self.static_update_findPeekInfo()
         self.logger.INFO("[寻峰] 找到 {} 个峰".format(len(self.peeks)))
+
+    def do_draw_peek(self, peek):
+        isinstance(peek, Peek)
+        current_plot = self.static_get_current_curve()[self.file_unpack_dict["current_mca"]]
+        signed_plot = peek.get_reversed_feature_array()
+        self.vLine_peek_ROI.setPen(pg.mkPen(color=(255, 255, 0, 0), width=2))
+        self.vLine_peek_ROI.setBrush(pg.mkBrush(color=(255, 255, 0, 80)))
+        self.vLine_peek_ROI.setCurves(pg.PlotDataItem(signed_plot),
+                                      pg.PlotDataItem(current_plot))
+
+    def do_hide_peek(self):
+        self.vLine_peek_ROI.setPen(pg.mkPen(color=(255, 240, 230, 0), width=1))
+        self.vLine_peek_ROI.setBrush(pg.mkBrush(color=(58, 89, 172, 0)))
 
     def do_draw_pulse(self, data):
         total_time = data[0][-1]
@@ -703,6 +732,14 @@ class MCA_MainUI(QMainWindow, Ui_MainWindow, QApplication):
                                                self.static_get_current_curve()
                                                )
         self.thread_pulse_generator.start()
+
+    def on_peek_changed(self):
+        item = self.listWidget_findPeek_peeks.currentIndex().row()
+        if not self.peeks:
+            self.do_hide_peek()
+            return
+        peek = self.peeks[item]
+        self.do_draw_peek(peek)
 
     def on_energyX_delete_clicked(self):
         item = self.listWidget_energyX_calaSpots.currentItem()
@@ -926,6 +963,7 @@ class MCA_MainUI(QMainWindow, Ui_MainWindow, QApplication):
             self.toolButton_section.setChecked(False)
             self.toolButton_findPeek.setChecked(False)
             self.stackedWidget_tool.setCurrentIndex(4)
+            self.stackedWidget_info.setCurrentIndex(2)
 
             if not self.tabWidget_top.isTabVisible(1):
                 self.tabWidget_top.setTabVisible(1, True)
@@ -964,6 +1002,8 @@ class MCA_MainUI(QMainWindow, Ui_MainWindow, QApplication):
             self.toolButton_smooth.setChecked(False)
             self.toolButton_genPulse.setChecked(False)
             self.stackedWidget_tool.setCurrentIndex(3)
+            if not self.tabWidget_top.isTabVisible(1):
+                self.tabWidget_top.setTabVisible(1, True)
             self.tabWidget_top.setCurrentIndex(1)
             self.stackedWidget_info.setCurrentIndex(0)
         else:
@@ -995,6 +1035,7 @@ class MCA_MainUI(QMainWindow, Ui_MainWindow, QApplication):
         # self.static_reset_plot_view()
         self.comboBox_originalFile.clear()
         self.comboBox_originalFile.addItem("选择原始能谱文件")
+        self.peeks = []
         for ele in self.files:
             list_item = ele[self.file_unpack_dict["list_item"]]
             filename = ele[self.file_unpack_dict["filename"]]
