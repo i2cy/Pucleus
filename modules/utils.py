@@ -12,6 +12,90 @@ from .energy_axis import linear_regression
 import numpy as np
 import pyqtgraph as pg
 from i2cylib import Logger
+from pyqtgraph import TargetItem
+from PyQt5.Qt import pyqtSignal
+from PyQt5 import QtCore
+
+
+class ModTargetItem(TargetItem):
+
+    clicked = pyqtSignal(int)
+
+    def __init__(self,
+                 pos=None,
+                 size=10,
+                 radii=None,
+                 symbol="crosshair",
+                 pen=None,
+                 hoverPen=None,
+                 brush=None,
+                 hoverBrush=None,
+                 movable=True,
+                 label=None,
+                 labelOpts=None,
+                 item_ID=0
+                 ):
+        """
+        Parameters
+        ----------
+        pos : list, tuple, QPointF, QPoint, Optional
+            Initial position of the symbol.  Default is (0, 0)
+        size : int
+            Size of the symbol in pixels.  Default is 10.
+        radii : tuple of int
+                    Deprecated.  Gives size of crosshair in screen pixels.
+        pen : QPen, tuple, list or str
+            Pen to use when drawing line. Can be any arguments that are valid
+            for :func:`~pyqtgraph.mkPen`. Default pen is transparent yellow.
+        brush : QBrush, tuple, list, or str
+            Defines the brush that fill the symbol. Can be any arguments that
+            is valid for :func:`~pyqtgraph.mkBrush`. Default is transparent
+            blue.
+        movable : bool
+            If True, the symbol can be dragged to a new position by the user.
+        hoverPen : QPen, tuple, list, or str
+            Pen to use when drawing symbol when hovering over it. Can be any
+            arguments that are valid for :func:`~pyqtgraph.mkPen`. Default pen
+            is red.
+        hoverBrush : QBrush, tuple, list or str
+            Brush to use to fill the symbol when hovering over it. Can be any
+            arguments that is valid for :func:`~pyqtgraph.mkBrush`. Default is
+            transparent blue.
+        symbol : QPainterPath or str
+            QPainterPath to use for drawing the target, should be centered at
+            ``(0, 0)`` with ``max(width, height) == 1.0``.  Alternatively a string
+            which can be any symbol accepted by
+            :func:`~pyqtgraph.ScatterPlotItem.setSymbol`
+        label : bool, str or callable, optional
+            Text to be displayed in a label attached to the symbol, or None to
+            show no label (default is None). May optionally include formatting
+            strings to display the symbol value, or a callable that accepts x
+            and y as inputs.  If True, the label is ``x = {: >.3n}\ny = {: >.3n}``
+            False or None will result in no text being displayed
+        labelOpts : dict
+            A dict of keyword arguments to use when constructing the text
+            label. See :class:`TargetLabel` and :class:`~pyqtgraph.TextItem`
+        """
+
+        super(ModTargetItem, self).__init__(pos=pos,
+                                            size=size,
+                                            radii=radii,
+                                            symbol=symbol,
+                                            pen=pen,
+                                            hoverPen=hoverPen,
+                                            brush=brush,
+                                            hoverBrush=hoverBrush,
+                                            movable=movable,
+                                            label=label,
+                                            labelOpts=labelOpts)
+
+        self.itemID = item_ID
+
+    def mouseClickEvent(self, ev):
+        super(ModTargetItem, self).mouseClickEvent(ev)
+        if ev.button() == QtCore.Qt.MouseButton.LeftButton:
+            ev.accept()
+            self.clicked.emit(self.itemID)
 
 
 class ModLogger:
@@ -105,7 +189,7 @@ class ColorManager(object):
             index = self.index
             self.index += 1
         ret = colorsys.hls_to_rgb(*self.base[index])
-        ret = [int(255)*ele for ele in ret]
+        ret = [int(255) * ele for ele in ret]
         return ret
 
     def gen_color(self, num):
@@ -140,8 +224,8 @@ def get_R_square(original_plot, current_plot):
     current_data.sort()
     b, a = linear_regression(original_data, current_data)
 
-    rr = np.sum(((original_data * a + b) - np.mean(current_data))**2) \
-         / np.sum((current_data - np.mean(current_data))**2)
+    rr = np.sum(((original_data * a + b) - np.mean(current_data)) ** 2) \
+         / np.sum((current_data - np.mean(current_data)) ** 2)
 
     return rr, a, b
 

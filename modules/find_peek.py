@@ -97,12 +97,12 @@ class Peek(object):
         plt.show()
 
     def area(self):
-        ret = self.__mca_data[self.left_edge: self.right_edge].sum()
+        ret = self.__mca_data[int(self.left_edge): int(self.right_edge)].sum()
         return ret
 
     def pure_area(self):
-        ret = self.get_area()
-        noise = self.__mca_data[self.left_edge] + self.__mca_data[self.right_edge]
+        ret = self.area()
+        noise = self.__mca_data[int(self.left_edge)] + self.__mca_data[int(self.right_edge)]
         noise *= self.right_edge - self.left_edge
         noise /= 2
         ret -= noise
@@ -135,6 +135,12 @@ class Peek(object):
         a /= 2
         ret += a
         return ret
+
+    def peek_point(self):
+        x = self.peek_location()
+        y = self.__mca_data[int(x)]
+
+        return x, y
 
 
 class SimpleCompare(PeekFinder):

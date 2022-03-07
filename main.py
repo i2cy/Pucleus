@@ -12,11 +12,11 @@ import pyqtgraph as pg
 import numpy as np
 from PyQt5.QtWidgets import QApplication, QMainWindow, QFileDialog, \
     QSizePolicy, QListWidgetItem, QMessageBox
-from PyQt5.QtGui import QIcon, QImage, QPixmap, QKeyEvent, QMouseEvent
+from PyQt5.QtGui import QIcon, QImage, QPixmap, QKeyEvent, QMouseEvent, QPainterPath
 from PyQt5.QtCore import Qt
 from pucleus_ui import Ui_MainWindow
 from modules.mca import MCA, Pulses
-from modules.utils import ColorManager, get_R_square, ModLogger, Mod_PlotWidget
+from modules.utils import ColorManager, get_R_square, ModLogger, Mod_PlotWidget, ModTargetItem
 import modules.smooth as smooth
 from modules.energy_axis import linear_regression
 from modules.threads import PulseGenThread, UpdatePulseInfoThread
@@ -357,7 +357,11 @@ class MCA_MainUI(QMainWindow, Ui_MainWindow, QApplication):
                     if self.doubleSpinBox_measure_rate.value():
                         self.doubleSpinBox_measure_time.setValue(total_count / self.doubleSpinBox_measure_rate.value())
 
-            self.label_filename.setText(ele[self.file_unpack_dict["filename"]])
+            filename = ele[self.file_unpack_dict["filename"]]
+            if len(filename) >= 20:
+                filename = filename.split(".")
+                filename = "{}....{}".format(filename[0][:17], filename[1])
+            self.label_filename.setText(filename)
             self.label_smooth.setText(smooth_methods)
             # print(self.K_energy_a, self.K_energy_b)
             if self.flag_energyX_available:
@@ -614,11 +618,11 @@ class MCA_MainUI(QMainWindow, Ui_MainWindow, QApplication):
             assert isinstance(ele, Peek)
             peek_location = ele.peek_location()
             if len(self.peeks) // 1000:
-                peek = "{:>4}. 峰位 {:.2f} ch".format(i+1, peek_location)
+                peek = "{:0>4}. 峰位 {:.2f} ch".format(i + 1, peek_location)
             elif len(self.peeks) // 100:
-                peek = "{:>3}. 峰位 {:.2f} ch".format(i + 1, peek_location)
+                peek = "{:0>3}. 峰位 {:.2f} ch".format(i + 1, peek_location)
             elif len(self.peeks) // 10:
-                peek = "{:>2}. 峰位 {:.2f} ch".format(i + 1, peek_location)
+                peek = "{:0>2}. 峰位 {:.2f} ch".format(i + 1, peek_location)
             else:
                 peek = "{}. 峰位 {:.2f} ch".format(i + 1, peek_location)
             if self.flag_energyX_available:
@@ -627,7 +631,9 @@ class MCA_MainUI(QMainWindow, Ui_MainWindow, QApplication):
             self.listWidget_findPeek_peeks.addItem(list_item)
 
     def do_find_peeks(self):
-        curve = self.static_get_current_curve()[self.file_unpack_dict["current_mca"]]
+        curve = self.static_get_current_curve()
+        curve_plot = curve[self.file_unpack_dict["plot"]]
+        curve = curve[self.file_unpack_dict["current_mca"]]
         if not isinstance(curve, MCA):
             return
         algorithm = self.comboBox_findPeek_algo.currentText()
@@ -642,19 +648,71 @@ class MCA_MainUI(QMainWindow, Ui_MainWindow, QApplication):
 
         self.peeks = pf
         self.static_update_findPeekInfo()
-        self.logger.INFO("[寻峰] 找到 {} 个峰".format(len(self.peeks)))
 
-    def do_draw_peek(self, peek):
+        symbol = QPainterPath()
+        symbol.lineTo(0, 0)
+        symbol.lineTo(0.2, -1)
+        symbol.lineTo(-0.2, -1)
+        symbol.lineTo(0, 0)
+
+        for i, peek in enumerate(self.peeks):
+            x, y = peek.peek_point()
+            item = ModTargetItem((x + 1, y), size=30,
+                                 movable=False, symbol=symbol, item_ID=i)
+            item.setPen(color=(220, 220, 220, 50), width=1.5)
+            item.setBrush(color=(200, 200, 200, 50))
+            item.setHoverPen(color=(255, 255, 255), width=1.5)
+            item.setHoverBrush(color=(220, 220, 220))
+            item.clicked.connect(self.on_peek_arrow_clicked)
+            self.plot_window.addItem(item)
+            self.peek_arrows.append(item)
+
+        self.logger.INFO("[寻峰] 找到 {} 个峰, 已将各峰位绘制在图上".format(len(self.peeks)))
+
+    def do_draw_peek(self, peek, index=0):
         isinstance(peek, Peek)
+        for item in self.peek_arrows:
+            item.setPen(color=(220, 220, 220, 50), width=1.5)
+            item.setBrush(color=(200, 200, 200, 50))
+            item.setLabel()
         signed_plot = peek.get_clip_feature_array()
         self.vLine_peek_ROI.clear()
         self.vLine_peek_ROI.setData(*signed_plot)
         self.vLine_peek_ROI.updateItems()
+        item = self.peek_arrows[index]
+        item.setPen(color=(255, 255, 0), width=3)
+        item.setBrush(color=(200, 200, 0))
+        peek_location = peek.peek_location()
+        pos = "{:.2f} ch".format(peek_location)
+        if self.flag_energyX_available:
+            pos += "/{:.4f} KeV".format(self.static_channel_2_energy(peek_location))
+        msg = "峰位：{}\n峰面积：{:.4f}\n净峰面积：{:.4f}".format(pos, peek.area(), peek.pure_area())
+        if self.action_showNuclide.isChecked():
+            msg += "------\n可能的核素：\n"
 
-    def do_hide_peek(self):
+        item.setLabel(msg, labelOpts={"offset": (-9, 31),
+                                      "fill": pg.mkBrush(color=(50, 50, 0)),
+                                      "anchor": (0, 1)})
+
+    def do_clear_peek(self):
         self.vLine_peek_ROI.clear()
         self.vLine_peek_ROI.setData([0], [0])
         self.vLine_peek_ROI.updateItems()
+        for i in self.peek_arrows:
+            self.plot_window.removeItem(i)
+        self.listWidget_findPeek_peeks.clear()
+        self.peek_arrows = []
+        self.peeks = []
+
+    def do_hide_peek_selection(self):
+        self.vLine_peek_ROI.clear()
+        self.vLine_peek_ROI.setData([0], [0])
+        self.vLine_peek_ROI.updateItems()
+        for item in self.peek_arrows:
+            item.setPen(color=(220, 220, 220, 50), width=1.5)
+            item.setBrush(color=(200, 200, 200, 50))
+            item.setLabel()
+        self.listWidget_findPeek_peeks.clearSelection()
 
     def do_draw_pulse(self, data):
         total_time = data[0][-1]
@@ -744,13 +802,17 @@ class MCA_MainUI(QMainWindow, Ui_MainWindow, QApplication):
                                                )
         self.thread_pulse_generator.start()
 
+    def on_peek_arrow_clicked(self, item_id):
+        self.listWidget_findPeek_peeks.setCurrentRow(item_id)
+        self.on_peek_changed()
+
     def on_peek_changed(self):
         item = self.listWidget_findPeek_peeks.currentIndex().row()
         if not self.peeks:
-            self.do_hide_peek()
+            self.do_clear_peek()
             return
         peek = self.peeks[item]
-        self.do_draw_peek(peek)
+        self.do_draw_peek(peek, item)
 
     def on_energyX_delete_clicked(self):
         item = self.listWidget_energyX_calaSpots.currentItem()
@@ -776,11 +838,10 @@ class MCA_MainUI(QMainWindow, Ui_MainWindow, QApplication):
                 break
         self.listWidget_file.takeItem(self.listWidget_file.currentRow())
         del item
-        self.on_file_changed()
         if not len(self.files):
             self.listWidget_file.clear()
-            self.plot_window.clear()
             self.flag_file_opened = False
+        self.on_file_changed()
 
     def on_mouse_section_pressed(self, event):
         assert isinstance(event, QMouseEvent)
@@ -815,6 +876,7 @@ class MCA_MainUI(QMainWindow, Ui_MainWindow, QApplication):
                 self.spinBox_energyX_channel_set.setValue(pos.x())
                 self.toolButton_energyX_select.setChecked(False)
                 self.on_energyX_button_select_clicked()
+
         self.flag_section_pressed = False
         self.on_tool_curse_clicked()
 
@@ -1069,9 +1131,11 @@ class MCA_MainUI(QMainWindow, Ui_MainWindow, QApplication):
         self.static_flush_graph()
         self.static_update_overview()
         self.static_clear_pulseInfo()
-        self.do_hide_peek()
+        self.do_clear_peek()
         # self.static_update_pulseInfo()
         self.static_update_windowTitle()
+
+        self.peek_arrows = []
 
     def on_mouse_clicked(self, evt):
         evt = evt[0]
@@ -1085,6 +1149,7 @@ class MCA_MainUI(QMainWindow, Ui_MainWindow, QApplication):
                 self.on_open_file()
         else:
             self.do_draw_section((0, 0))
+            self.do_hide_peek_selection()
             trans = [evt.scenePos()]
             self.on_mouse_moved(trans)
         evt.accept()
