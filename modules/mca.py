@@ -609,10 +609,12 @@ class Pulses(object):
             # print(self.__len__)
 
             enX_a = data[14:18]  # 4B 能量刻度参数A
+            # print(enX_a)
             self.energyX_a = struct.unpack("f", enX_a)[0]
 
             enX_b = data[18:22]  # 4B 能量刻度参数B
             self.energyX_b = struct.unpack("f", enX_b)[0]
+            # print(self.energyX_a)
 
             sha = data[22:54]  # 32B 全文除此字段的sha256校验和
             hasher = hashlib.sha256()
@@ -660,6 +662,8 @@ class Pulses(object):
         data += total_time
 
         enX_a = struct.pack("f", self.energyX_a)
+        # print(enX_a)
+        # print(self.energyX_a)
         data += enX_a
 
         enX_b = struct.pack("f", self.energyX_b)

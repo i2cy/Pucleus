@@ -120,6 +120,13 @@ class Peek(object):
         ret -= t
         return ret
 
+    def get_clip_feature_array(self, offset=1):
+        y = self.__mca_data[int(self.left_edge):int(self.right_edge)]
+        x = np.linspace(int(self.left_edge) + offset, int(self.right_edge) + offset,
+                        len(y),
+                        dtype=np.int32)
+        return x, y
+
     def peek_location(self):
         ret = self.position
         a = self.__mca_data[self.position + 1] - self.__mca_data[self.position - 1]

@@ -66,8 +66,8 @@ class PulseGenThread(QThread):
 
         pulse.total_time = self.total_time
         if self.parent.flag_energyX_available:
-            pulse.energyX_a = int(self.parent.K_energy_a * 1000000)
-            pulse.energyX_b = int(self.parent.K_energy_b * 1000000)
+            pulse.energyX_a = self.parent.K_energy_a
+            pulse.energyX_b = self.parent.K_energy_b
         pulse.to_file(self.filename)
 
         if self.open_after:

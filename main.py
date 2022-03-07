@@ -209,8 +209,10 @@ class MCA_MainUI(QMainWindow, Ui_MainWindow, QApplication):
         self.vLine = pg.InfiniteLine(angle=90, movable=False)
         self.vLine.setPen(pg.mkPen(color=(255, 255, 0, 0), width=1.5))
 
-        self.vLine_peek_ROI = pg.FillBetweenItem()
-        pg.PlotDataItem()
+        self.vLine_peek_ROI = pg.PlotDataItem()
+        self.vLine_peek_ROI.setPen(pg.mkPen(color=(255, 255, 0, 100), width=3))
+        self.vLine_peek_ROI.setBrush(pg.mkBrush(color=(255, 255, 0, 80)))
+        self.vLine_peek_ROI.setFillLevel(0)
 
         self.section_item = pg.LinearRegionItem(pen=pg.mkPen(color=(255, 200, 0, 0), width=1.5))
         self.section_item.setMovable(False)
@@ -266,6 +268,7 @@ class MCA_MainUI(QMainWindow, Ui_MainWindow, QApplication):
         self.files = []
 
         self.peeks = []
+        self.peek_arrows = []
 
         """
         [channel, energy]
@@ -358,7 +361,7 @@ class MCA_MainUI(QMainWindow, Ui_MainWindow, QApplication):
             self.label_smooth.setText(smooth_methods)
             # print(self.K_energy_a, self.K_energy_b)
             if self.flag_energyX_available:
-                self.label_energyXclac.setText("已校正, a:{:.4f}, b:{:.4f}".format(
+                self.label_energyXclac.setText("已校正, \na:{:.4f}, b:{:.4f}".format(
                     self.K_energy_a, self.K_energy_b))
             else:
                 self.label_energyXclac.setText("未校正")
@@ -610,9 +613,16 @@ class MCA_MainUI(QMainWindow, Ui_MainWindow, QApplication):
         for i, ele in enumerate(self.peeks):
             assert isinstance(ele, Peek)
             peek_location = ele.peek_location()
-            peek = "{}. 峰位 {:.2f} ch".format(i+1, peek_location)
+            if len(self.peeks) // 1000:
+                peek = "{:>4}. 峰位 {:.2f} ch".format(i+1, peek_location)
+            elif len(self.peeks) // 100:
+                peek = "{:>3}. 峰位 {:.2f} ch".format(i + 1, peek_location)
+            elif len(self.peeks) // 10:
+                peek = "{:>2}. 峰位 {:.2f} ch".format(i + 1, peek_location)
+            else:
+                peek = "{}. 峰位 {:.2f} ch".format(i + 1, peek_location)
             if self.flag_energyX_available:
-                peek += " {:.2f} KeV".format(self.static_channel_2_energy(peek_location))
+                peek += "/{:.2f} KeV".format(self.static_channel_2_energy(peek_location))
             list_item = QListWidgetItem(peek, parent=self.listWidget_findPeek_peeks)
             self.listWidget_findPeek_peeks.addItem(list_item)
 
@@ -636,16 +646,15 @@ class MCA_MainUI(QMainWindow, Ui_MainWindow, QApplication):
 
     def do_draw_peek(self, peek):
         isinstance(peek, Peek)
-        current_plot = self.static_get_current_curve()[self.file_unpack_dict["current_mca"]]
-        signed_plot = peek.get_reversed_feature_array()
-        self.vLine_peek_ROI.setPen(pg.mkPen(color=(255, 255, 0, 0), width=2))
-        self.vLine_peek_ROI.setBrush(pg.mkBrush(color=(255, 255, 0, 80)))
-        self.vLine_peek_ROI.setCurves(pg.PlotDataItem(signed_plot),
-                                      pg.PlotDataItem(current_plot))
+        signed_plot = peek.get_clip_feature_array()
+        self.vLine_peek_ROI.clear()
+        self.vLine_peek_ROI.setData(*signed_plot)
+        self.vLine_peek_ROI.updateItems()
 
     def do_hide_peek(self):
-        self.vLine_peek_ROI.setPen(pg.mkPen(color=(255, 240, 230, 0), width=1))
-        self.vLine_peek_ROI.setBrush(pg.mkBrush(color=(58, 89, 172, 0)))
+        self.vLine_peek_ROI.clear()
+        self.vLine_peek_ROI.setData([0], [0])
+        self.vLine_peek_ROI.updateItems()
 
     def do_draw_pulse(self, data):
         total_time = data[0][-1]
@@ -656,9 +665,11 @@ class MCA_MainUI(QMainWindow, Ui_MainWindow, QApplication):
                                                                yMin=-9, yMax=1024 + 9)
 
         self.pulse_plot = self.pulse_plot_window.plot(*data,
-                                                      pen=pg.mkPen(color=(255, 200, 0, 80),
-                                                                   width=0.2,
-                                                                   stepMode="left")
+                                                      pen=None,
+                                                      symbol='o',
+                                                      symbolSize=1,
+                                                      symbolPen=None,
+                                                      symbolBrush=(191, 93, 17, 50)
                                                       )
         self.logger.INFO("[核脉冲模块] 脉冲预览图已绘制")
 
@@ -767,6 +778,8 @@ class MCA_MainUI(QMainWindow, Ui_MainWindow, QApplication):
         del item
         self.on_file_changed()
         if not len(self.files):
+            self.listWidget_file.clear()
+            self.plot_window.clear()
             self.flag_file_opened = False
 
     def on_mouse_section_pressed(self, event):
@@ -1056,6 +1069,7 @@ class MCA_MainUI(QMainWindow, Ui_MainWindow, QApplication):
         self.static_flush_graph()
         self.static_update_overview()
         self.static_clear_pulseInfo()
+        self.do_hide_peek()
         # self.static_update_pulseInfo()
         self.static_update_windowTitle()
 
