@@ -688,7 +688,7 @@ class MCA_MainUI(QMainWindow, Ui_MainWindow, QApplication):
             pos += "/{:.4f} KeV".format(self.static_channel_2_energy(peek_location))
         msg = "峰位：{}\n峰面积：{:.4f}\n净峰面积：{:.4f}".format(pos, peek.area(), peek.pure_area())
         if self.action_showNuclide.isChecked():
-            msg += "------\n可能的核素：\n"
+            msg += "\n------\n可能的核素："
 
         item.setLabel(msg, labelOpts={"offset": (-9, 31),
                                       "fill": pg.mkBrush(color=(50, 50, 0)),

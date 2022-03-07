@@ -143,6 +143,71 @@ class Peek(object):
         return x, y
 
 
+class Derivative(PeekFinder):
+
+    def __init__(self, mca, scan_range, level, dots):
+        """
+        导数法
+
+        :param mca: MCA, MCA对象
+        :param scan_range: (int index_satrt, int index_end)
+        :param level: int, 阶数
+        :param dots: int, 点数，一般取5， 7， 9， 11
+        """
+        super(Derivative, self).__init__(mca, scan_range)
+
+        # Kb A0 A1 A2 A3 A4 A5
+        # 注意一阶、三阶导数法参数呈中心对称
+
+        self.__level_table = [[
+            [], [],
+            [12, 0, 8, -1, 0, 0, 0],
+            [252, 0, 58, 67, -22, 0, 0],
+            [1188, 0, 126, 193, 142, -86, 0],
+            [5148, 0, 296, 503, 532, 294, -300]
+        ],[
+            [], [],
+            [7, -2, -1, 2, 0, 0, 0],
+            [42, -4, -3, 0, 5, 0, 0],
+            [462, -20, -17, -8, 7, 28, 0],
+            [429, -10, -9, -6, -1, 6, 15]
+        ],[
+            [], [],
+            [2, 0, -2, 1, 0, 0, 0],
+            [6, 0, -1, -1, 1, 0, 0]
+        ]]
+
+        self.m = dots // 2
+        self.level = level
+
+    def __get_derivatives(self):
+        m = self.m
+        level = self.level
+        ret = np.zeros(len(self.mca), dtype=np.float64)
+        for i, ele in enumerate(self.mca[m:-m]):
+            ret[m+i] = ele * self.__level_table[level-1][m][1]
+            for i2 in range(m):
+                ret[m + i] += self.mca[m + i + i2 + 1] * self.__level_table[level - 1][m][i2 + 2]
+                if level % 2:
+                    ret[m + i] += self.mca[m + i - i2 - 1] * self.__level_table[level - 1][m][i2 + 2] * -1
+                else:
+                    ret[m + i] += self.mca[m + i - i2 - 1] * self.__level_table[level - 1][m][i2 + 2]
+            ret[m+1] /= self.__level_table[level-1][m][0]
+
+        return ret
+
+    def __validate(self, peek, deri):
+        pass
+
+    def search(self, ranges=None):
+        super(Derivative, self).search(ranges)
+
+        deri = self.__get_derivatives()
+
+
+
+
+
 class SimpleCompare(PeekFinder):
 
     def __init__(self, mca, scan_range, k, m):

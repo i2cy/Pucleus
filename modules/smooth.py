@@ -87,9 +87,9 @@ class PolynomialLeastSquareMethod(Smoother):
             cal_t = ks[1] * self.data[m * h + i]
 
             for i2 in range(m):
-                cal_t += self.data[(m - i2) * h + i] * ks[i2 + 2]
+                cal_t += self.data[(m - i2 - 1) * h + i] * ks[i2 + 2]
 
-                cal_t += self.data[(m + i2) * h + i] * ks[i2 + 2]
+                cal_t += self.data[(m + i2 + 1) * h + i] * ks[i2 + 2]
 
             cal_t /= ks[0]
 
