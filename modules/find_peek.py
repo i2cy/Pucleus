@@ -9,6 +9,8 @@ from .mca import MCA, Pulses
 import numpy as np
 import matplotlib.pyplot as plt
 
+import time
+
 
 class PeekFinder(object):
 
@@ -64,6 +66,8 @@ class PeekFinder(object):
         self.flag_searched = False
 
     def search(self, range=None):
+        self.flag_searched = False
+        self.peeks = []
         if range is not None:
             self.range = range
 
@@ -85,10 +89,10 @@ class Peek(object):
 
     def plotshow(self):
         ind = np.zeros(len(self.__mca_data))
-        ind[self.left_edge] = self.__mca_data[self.left_edge] + 100
-        ind[self.right_edge] = self.__mca_data[self.right_edge] + 100
+        ind[int(self.left_edge)] = self.__mca_data[int(self.left_edge)] + 100
+        ind[int(self.right_edge)] = self.__mca_data[int(self.right_edge)] + 100
         top = np.zeros(len(self.__mca_data))
-        top[self.position] = self.__mca_data[self.position] + 100
+        top[int(self.position)] = self.__mca_data[int(self.position)] + 100
 
         plt.plot(self.__mca_data)
         plt.plot(ind, color="orange")
@@ -129,11 +133,17 @@ class Peek(object):
 
     def peek_location(self):
         ret = self.position
-        a = self.__mca_data[self.position + 1] - self.__mca_data[self.position - 1]
-        a /= 2 * self.__mca_data[self.position] - self.__mca_data[self.position + 1] - \
-             self.__mca_data[self.position - 1]
-        a /= 2
-        ret += a
+
+        if not self.position % 1:
+            try:
+                a = self.__mca_data[self.position + 1] - self.__mca_data[self.position - 1]
+                a /= 2 * self.__mca_data[self.position] - self.__mca_data[self.position + 1] - \
+                     self.__mca_data[self.position - 1]
+                a /= 2
+                ret += a
+            except Exception:
+                pass
+
         return ret
 
     def peek_point(self):
@@ -192,11 +202,12 @@ class Derivative(PeekFinder):
                     ret[m + i] += self.mca[m + i - i2 - 1] * self.__level_table[level - 1][m][i2 + 2] * -1
                 else:
                     ret[m + i] += self.mca[m + i - i2 - 1] * self.__level_table[level - 1][m][i2 + 2]
-            ret[m + 1] /= self.__level_table[level - 1][m][0]
+            ret[m + i] /= self.__level_table[level - 1][m][0]
 
         return ret
 
     def __validate(self, peek_location, edges, deri):
+        edges = [int(ele) for ele in edges]
         deri_range = deri[edges[0]:edges[1]]
         n = max(deri_range) - min(deri_range)
         hight_base = self.mca[edges[0]] + self.mca[edges[1]]
@@ -209,55 +220,107 @@ class Derivative(PeekFinder):
         left_half = edges[0]
         right_half = edges[1]
 
-        for i, ele in enumerate(self.mca[peek_location:edges[0] - 1:-1]):
+        for i, ele in enumerate(self.mca[int(peek_location):edges[0] - 1:-1]):
             if ele <= half_hight:
                 left_half = peek_location - i
+                break
 
-        for i, ele in enumerate(self.mca[peek_location:edges[1]]):
+        for i, ele in enumerate(self.mca[int(peek_location):-edges[1]]):
             if ele <= half_hight:
                 right_half = peek_location + i
+                break
 
         fwhm = right_half - left_half
-        ret = 0.8 * fwhm <= n <= 3 * fwhm
+        ret = 0.8 * fwhm <= n
+        if not self.mca[int(peek_location)]:
+            ret = False
 
         return ret
 
     def __find_edges(self, deri, peek_location):
         left_edge = self.range[0]
         right_edge = self.range[1]
-        for i, ele in enumerate(deri[peek_location:self.m - 1:-1]):
-            if ele >= 0 and deri[peek_location - i - 1] <= 0:
-                k = ele - deri[peek_location - i - 1]
+        first = True
+        for i, ele in enumerate(deri[int(peek_location):self.m - 1:-1]):
+            if first:
+                first = False
+                continue
+            if self.level == 1 and ele >= 0 and deri[int(peek_location) - i - 1] <= 0:
+                k = ele - deri[int(peek_location) - i - 1]
                 if k:
                     # y = kx + b <=> b = y - kx <=> x = (y - b) / k
                     b = ele - k * (peek_location - i)
                     left_edge = (-b) / k
                 else:
                     left_edge = peek_location - i - 0.5
-        for i, ele in enumerate(deri[peek_location:self.m + 1]):
-            if ele <= 0 and deri[peek_location + i + 1] >= 0:
-                k = deri[peek_location + i + 1] - ele
+                break
+            elif self.level == 3 and ele <= 0 and deri[int(peek_location) - i - 1] >= 0:
+                k = ele - deri[int(peek_location) - i - 1]
+                if k:
+                    # y = kx + b <=> b = y - kx <=> x = (y - b) / k
+                    b = ele - k * (peek_location - i)
+                    left_edge = (-b) / k
+                else:
+                    left_edge = peek_location - i - 0.5
+                break
+        first = True
+        for i, ele in enumerate(deri[int(peek_location):-(self.m + 1)]):
+            if first:
+                first = False
+                continue
+            if self.level == 1 and ele <= 0 and deri[int(peek_location) + i + 1] >= 0:
+                k = deri[int(peek_location) + i + 1] - ele
                 if k:
                     # y = kx + b <=> b = y - kx <=> x = (y - b) / k
                     b = ele - k * (peek_location + i)
                     right_edge = (-b) / k
                 else:
                     right_edge = peek_location + i + 0.5
+                break
+            elif self.level == 3 and ele >= 0 and deri[int(peek_location) + i + 1] <= 0:
+                k = deri[int(peek_location) + i + 1] - ele
+                if k:
+                    # y = kx + b <=> b = y - kx <=> x = (y - b) / k
+                    b = ele - k * (peek_location + i)
+                    right_edge = (-b) / k
+                else:
+                    right_edge = peek_location + i + 0.5
+                break
         return left_edge, right_edge
 
     def __find_peeks(self, deri):
         for i, ele in enumerate(deri[self.range[0]:self.range[1] - 1]):
-            if ele >= 0 and deri[self.range[0] + i + 1] <= 0:
-                k = deri[self.range[0] + i + 1] - ele
-                if k:
-                    b = ele - k * (self.range[0] + i)
-                    peek = (-b) / k
-                else:
-                    peek = self.range[0] + i + 0.5
+            if self.level == 1:
+                if ele >= 0 and deri[self.range[0] + i + 1] <= 0:
+                    k = deri[self.range[0] + i + 1] - ele
+                    if k:
+                        b = ele - k * (self.range[0] + i)
+                        peek = (-b) / k
+                    else:
+                        peek = self.range[0] + i + 0.5
 
-                edges = self.__find_edges(deri, peek)
-                if self.__validate(peek, edges, deri):
-                    self.peeks.append(Peek(peek, edges, self.mca))
+                    edges = self.__find_edges(deri, peek)
+                    peek_object = Peek(peek, edges, self.mca)
+                    if self.__validate(peek, edges, deri):
+                        self.peeks.append(peek_object)
+
+            elif self.level == 3:
+                if ele <= 0 and deri[self.range[0] + i + 1] >= 0:
+                    k = deri[self.range[0] + i + 1] - ele
+                    if k:
+                        b = ele - k * (self.range[0] + i)
+                        peek = (-b) / k
+                    else:
+                        peek = self.range[0] + i + 0.5
+
+                    edges = self.__find_edges(deri, peek)
+                    peek_object = Peek(peek, edges, self.mca)
+                    self.peeks.append(peek_object)
+
+    def debug_draw(self):
+        plt.plot(self.__get_derivatives())
+        plt.plot(self.mca)
+        plt.show()
 
     def search(self, ranges=None):
         super(Derivative, self).search(ranges)

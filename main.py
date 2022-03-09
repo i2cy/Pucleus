@@ -20,7 +20,7 @@ from modules.utils import ColorManager, get_R_square, ModLogger, Mod_PlotWidget,
 import modules.smooth as smooth
 from modules.energy_axis import linear_regression
 from modules.threads import PulseGenThread, UpdatePulseInfoThread
-from modules.find_peek import SimpleCompare, Peek
+from modules.find_peek import SimpleCompare, Peek, Derivative
 
 
 class MCA_MainUI(QMainWindow, Ui_MainWindow, QApplication):
@@ -636,8 +636,11 @@ class MCA_MainUI(QMainWindow, Ui_MainWindow, QApplication):
         curve = curve[self.file_unpack_dict["current_mca"]]
         if not isinstance(curve, MCA):
             return
+        self.do_clear_peek()
         algorithm = self.comboBox_findPeek_algo.currentText()
         ranges = self.static_get_section()
+        if (ranges[1] - ranges[0]) <= 1:
+            ranges = [0, len(curve) - 1]
         pf = []
         self.logger.DEBUG("[寻峰] 正在使用 {} 算法在 {} 区域内寻峰".format(algorithm, ranges))
         if algorithm == "简单比较法":
@@ -645,6 +648,14 @@ class MCA_MainUI(QMainWindow, Ui_MainWindow, QApplication):
             m = self.spinBox_findPeek_sc_M.value()
             ranges = [int(ele) for ele in ranges]
             pf = SimpleCompare(curve, scan_range=ranges, k=k, m=m)
+        elif algorithm == "导数法":
+            level = self.spinBox_findPeek_deri_level.value()
+            dots = self.spinBox_findPeek_deri_dots.value()
+            if level == 3 and dots > 7:
+                pop_notice(QMessageBox.Warning, "错误", "三阶导数法仅支持最高7点设置")
+                return
+            ranges = [int(ele) for ele in ranges]
+            pf = Derivative(curve, ranges, level, dots)
 
         self.peeks = pf
         self.static_update_findPeekInfo()
