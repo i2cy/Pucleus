@@ -7,6 +7,7 @@
 
 import random
 import colorsys
+import re
 from .mca import MCA
 from .energy_axis import linear_regression
 import numpy as np
@@ -208,28 +209,6 @@ class ColorManager(object):
         self.base = hls_colors
 
 
-def get_R_square(original_plot, current_plot):
-    """
-    linear_regression with R^2
-
-    :param original_plot:
-    :param current_plot:
-    :return:
-    """
-    assert isinstance(original_plot, MCA)
-    assert isinstance(current_plot, MCA)
-    original_data = original_plot.as_numpy()
-    original_data.sort()
-    current_data = current_plot.as_numpy()
-    current_data.sort()
-    b, a = linear_regression(original_data, current_data)
-
-    rr = np.sum(((original_data * a + b) - np.mean(current_data)) ** 2) \
-         / np.sum((current_data - np.mean(current_data)) ** 2)
-
-    return rr, a, b
-
-
 class Mod_PlotWidget(pg.PlotWidget):
 
     def __init__(self, *key, **kwargs):
@@ -275,3 +254,32 @@ class Mod_PlotWidget(pg.PlotWidget):
         super(Mod_PlotWidget, self).keyReleaseEvent(ev)
         # print(ev)
         self.post_keyReleaseEvent(ev)
+
+
+def get_R_square(original_plot, current_plot):
+    """
+    linear_regression with R^2
+
+    :param original_plot:
+    :param current_plot:
+    :return:
+    """
+    assert isinstance(original_plot, MCA)
+    assert isinstance(current_plot, MCA)
+    original_data = original_plot.as_numpy()
+    original_data.sort()
+    current_data = current_plot.as_numpy()
+    current_data.sort()
+    b, a = linear_regression(original_data, current_data)
+
+    rr = np.sum(((original_data * a + b) - np.mean(current_data)) ** 2) \
+         / np.sum((current_data - np.mean(current_data)) ** 2)
+
+    return rr, a, b
+
+
+# 判断一个字符串是否是小数
+def IsFloat(s):
+    pattern = '^-?\d+\.?\d*$'  # 匹配数字: 从头开始匹配 -0或1次 数字1或多次 .0或1次 数字0或多次 匹配到字符串末尾
+    match = re.match(pattern, s)
+    return match != None
