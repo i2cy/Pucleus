@@ -17,6 +17,25 @@ class Nucleo(object):
         self.cluster_prob = data[1]
         self.energy = data[0]
 
+    def __eq__(self, other):
+        assert isinstance(other, Nucleo)
+        condition_1 = self.name.lower == other.name.lower
+        condition_2 = self.cluster_prob == other.cluster_prob
+        condition_3 = self.energy == other.energy
+        ret = condition_1 and condition_2 and condition_3
+        return ret
+
+    def __ne__(self, other):
+        assert isinstance(other, Nucleo)
+        return not self.__eq__(other)
+
+    def __str__(self):
+        return self.summary()
+
+    def summary(self):
+        ret = "{} {:.4f} Kev ({:.2f}%)".format(self.name, self.energy, self.cluster_prob*100)
+        return ret
+
 
 class Library(object):
 

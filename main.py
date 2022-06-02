@@ -21,6 +21,7 @@ import modules.smooth as smooth
 from modules.energy_axis import linear_regression
 from modules.threads import PulseGenThread, UpdatePulseInfoThread
 from modules.find_peek import SimpleCompare, Peek, Derivative
+from modules.libraries import Library, Nucleo
 
 
 class MCA_MainUI(QMainWindow, Ui_MainWindow, QApplication):
@@ -54,6 +55,7 @@ class MCA_MainUI(QMainWindow, Ui_MainWindow, QApplication):
         self.action_zoomIn.triggered.connect(self.on_zoom_in)
         self.action_zoomOut.triggered.connect(self.on_zoom_out)
         self.action_export_chn.triggered.connect(self.on_save_file)
+        self.action_showNuclide.toggled.connect(self.on_action_showNucleo_clicked)
 
         self.toolButton_openFile.clicked.connect(self.on_open_file)
         self.toolButton_save.clicked.connect(self.on_save_file)
@@ -80,6 +82,9 @@ class MCA_MainUI(QMainWindow, Ui_MainWindow, QApplication):
         self.pushButton_findPeek_yes.clicked.connect(self.do_find_peeks)
 
         self.pushButton_export_pulse.clicked.connect(self.on_export_pulse_buttom_clicked)
+
+        self.toolButton_library_add.clicked.connect(self.on_add_library_clicked)
+        self.toolButton_library_remove.clicked.connect(self.static_remove_library)
 
         self.spinBox_section_start.valueChanged.connect(self.on_section_spinbox_start_changed)
         self.spinBox_section_end.valueChanged.connect(self.on_section_spinbox_end_changed)
@@ -269,6 +274,8 @@ class MCA_MainUI(QMainWindow, Ui_MainWindow, QApplication):
 
         self.peeks = []
         self.peek_arrows = []
+
+        self.libraries = []
 
         """
         [channel, energy]
@@ -630,8 +637,32 @@ class MCA_MainUI(QMainWindow, Ui_MainWindow, QApplication):
             list_item = QListWidgetItem(peek, parent=self.listWidget_findPeek_peeks)
             self.listWidget_findPeek_peeks.addItem(list_item)
 
+    def static_add_library(self, filenames):
+        for i in filenames:
+            try:
+                lib = Library(i)
+                if lib.filename in [ele.filename for ele in self.libraries]:
+                    raise Exception("{} 已经在核素库列表中".format(lib.filename))
+            except Exception as err:
+                pop_notice(QMessageBox.Warning, "错误", "无法导入核素库\n\n{}".format(err))
+                continue
+            self.libraries.append(lib)
+            basic, details = lib.summary()
+            list_item = QListWidgetItem(basic, self.listWidget_libraries)
+            list_item.setToolTip(details)
+            self.listWidget_libraries.addItem(list_item)
+            self.listWidget_libraries.setCurrentRow(0)
+
+    def static_remove_library(self):
+        if self.libraries:
+            index = self.listWidget_libraries.currentRow()
+            self.libraries.pop(index)
+            self.listWidget_libraries.takeItem(index)
+
     def do_find_peeks(self):
         curve = self.static_get_current_curve()
+        if curve is None:
+            return
         curve_plot = curve[self.file_unpack_dict["plot"]]
         curve = curve[self.file_unpack_dict["current_mca"]]
         if not isinstance(curve, MCA):
@@ -678,14 +709,57 @@ class MCA_MainUI(QMainWindow, Ui_MainWindow, QApplication):
             self.plot_window.addItem(item)
             self.peek_arrows.append(item)
 
+        self.do_display_nucleo()
+
         self.logger.INFO("[寻峰] 找到 {} 个峰, 已将各峰位绘制在图上".format(len(self.peeks)))
+
+    def do_display_nucleo(self):
+        if not self.libraries or not self.flag_energyX_available \
+                or not self.peeks:
+            return
+        min_gap = 10
+        if self.action_showNuclide.isChecked():
+            if self.libraries and self.flag_energyX_available:
+                min_gap = self.static_channel_2_energy(self.peeks[-1].mean) - \
+                          self.static_channel_2_energy(self.peeks[0].mean)
+
+                for i, ele in enumerate(self.peeks[:-1]):
+                    gap = self.static_channel_2_energy(self.peeks[i + 1].mean) - \
+                          self.static_channel_2_energy(ele.mean)
+                    if gap and gap < min_gap:
+                        min_gap = gap
+
+                for i in self.libraries:
+                    assert isinstance(i, Library)
+                    i.set_KE(min_gap)
+
+            for i, item in enumerate(self.peek_arrows):
+                msg = ""
+                energy = self.static_channel_2_energy(self.peeks[i].peek_location())
+                res = []
+                for lib in self.libraries:
+                    assert isinstance(lib, Library)
+                    res += lib.match(energy)
+                for la in res:
+                    msg += "{}, ".format(la.name)
+                if msg:
+                    msg = msg[:-2]
+                item.setLabel(msg, labelOpts={"offset": (9, 31),
+                                              "anchor": (0, 1),
+                                              "angle": 60,
+                                              "color": pg.mkColor(150, 150, 128)})
 
     def do_draw_peek(self, peek, index=0):
         isinstance(peek, Peek)
-        for item in self.peek_arrows:
+        res = []
+
+        for i, item in enumerate(self.peek_arrows):
             item.setPen(color=(220, 220, 220, 50), width=1.5)
             item.setBrush(color=(200, 200, 200, 50))
             item.setLabel()
+
+        self.do_display_nucleo()
+
         signed_plot = peek.get_clip_feature_array()
         self.vLine_peek_ROI.clear()
         self.vLine_peek_ROI.setData(*signed_plot)
@@ -693,13 +767,24 @@ class MCA_MainUI(QMainWindow, Ui_MainWindow, QApplication):
         item = self.peek_arrows[index]
         item.setPen(color=(255, 255, 0), width=3)
         item.setBrush(color=(200, 200, 0))
-        peek_location = peek.peek_location()
+        peek_location, peek_hight = peek.peek_point()
+
+        if self.libraries and self.flag_energyX_available:  # 核素识别
+            res = []
+            for i in self.libraries:
+                assert isinstance(i, Library)
+                res += i.match(self.static_channel_2_energy(peek_location))
+
         pos = "{:.2f} ch".format(peek_location)
         if self.flag_energyX_available:
             pos += "/{:.4f} KeV".format(self.static_channel_2_energy(peek_location))
-        msg = "峰位：{}\n峰面积：{:.4f}\n净峰面积：{:.4f}".format(pos, peek.area(), peek.pure_area())
-        if self.action_showNuclide.isChecked():
+        msg = "峰位：{}\n计数：{:.4f}\n峰面积：{}\n净峰面积：{:.4f}".format(
+            pos, peek_hight, peek.area(), peek.pure_area()
+        )
+        if res:
             msg += "\n------\n可能的核素："
+            for i in res:
+                msg += "\n{}".format(i)
 
         item.setLabel(msg, labelOpts={"offset": (-9, 31),
                                       "fill": pg.mkBrush(color=(50, 50, 0)),
@@ -723,6 +808,7 @@ class MCA_MainUI(QMainWindow, Ui_MainWindow, QApplication):
             item.setPen(color=(220, 220, 220, 50), width=1.5)
             item.setBrush(color=(200, 200, 200, 50))
             item.setLabel()
+        self.do_display_nucleo()
         self.listWidget_findPeek_peeks.clearSelection()
 
     def do_draw_pulse(self, data):
@@ -812,6 +898,20 @@ class MCA_MainUI(QMainWindow, Ui_MainWindow, QApplication):
                                                self.static_get_current_curve()
                                                )
         self.thread_pulse_generator.start()
+
+    def on_action_showNucleo_clicked(self):
+        self.do_hide_peek_selection()
+        self.do_display_nucleo()
+
+    def on_add_library_clicked(self):
+        filenames = QFileDialog.getOpenFileNames(caption="打开",
+                                                 filter="所有支持的文件格式 (*.xls; *.csv);;"
+                                                        "CSV UTF-8 逗号分隔 (*.csv);;"
+                                                        "Excel 97-2003 工作簿 (*.xls);;",
+                                                 parent=self)[0]
+        if filenames:
+            self.static_add_library(filenames)
+            self.do_display_nucleo()
 
     def on_peek_arrow_clicked(self, item_id):
         self.listWidget_findPeek_peeks.setCurrentRow(item_id)

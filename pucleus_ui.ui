@@ -1655,8 +1655,8 @@
                       <rect>
                        <x>0</x>
                        <y>0</y>
-                       <width>174</width>
-                       <height>96</height>
+                       <width>363</width>
+                       <height>361</height>
                       </rect>
                      </property>
                      <layout class="QGridLayout" name="gridLayout_9">
@@ -1733,7 +1733,7 @@
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>332</width>
+                   <width>342</width>
                    <height>483</height>
                   </rect>
                  </property>
@@ -1919,7 +1919,7 @@
              <enum>QTabWidget::Rounded</enum>
             </property>
             <property name="currentIndex">
-             <number>0</number>
+             <number>2</number>
             </property>
             <property name="elideMode">
              <enum>Qt::ElideNone</enum>
@@ -2088,8 +2088,8 @@
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>270</width>
-                   <height>340</height>
+                   <width>363</width>
+                   <height>361</height>
                   </rect>
                  </property>
                  <layout class="QGridLayout" name="gridLayout_8">
@@ -2292,8 +2292,8 @@ p, li { white-space: pre-wrap; }
                   <rect>
                    <x>0</x>
                    <y>0</y>
-                   <width>111</width>
-                   <height>166</height>
+                   <width>363</width>
+                   <height>361</height>
                   </rect>
                  </property>
                  <layout class="QGridLayout" name="gridLayout_13">
@@ -2361,7 +2361,7 @@ p, li { white-space: pre-wrap; }
                    </widget>
                   </item>
                   <item row="1" column="0" colspan="3">
-                   <widget class="QListView" name="listView_libraries"/>
+                   <widget class="QListWidget" name="listWidget_libraries"/>
                   </item>
                  </layout>
                 </widget>
@@ -2482,7 +2482,7 @@ p, li { white-space: pre-wrap; }
     <bool>true</bool>
    </property>
    <property name="checked">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
    <property name="text">
     <string>显示核素</string>
